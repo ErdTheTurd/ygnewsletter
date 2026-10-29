@@ -348,6 +348,12 @@ a:hover { color: var(--ink); }
   color: #fff;
 }
 
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
 .btn--ghost {
   background: transparent;
   color: var(--ink);
@@ -1029,6 +1035,184 @@ body.is-admin .admin-editable {
 .mem-card.is-up, .mem-card.is-matched {
   background: #fff6ee;
   color: inherit;
+}
+
+.game-shell--wide { max-width: 920px; }
+
+.fleet, .tool-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.fleet[hidden] { display: none !important; }
+
+.mini-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  background: #fff6ee;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.mini-btn.is-on, .btn.is-on { background: var(--gold); color: var(--clay); border-color: var(--gold); }
+
+.sea-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.sea-wrap h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.sea {
+  display: grid;
+  grid-template-columns: 16px repeat(10, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.sea i {
+  font-style: normal;
+  font-size: 0.62rem;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+}
+
+.cell {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 4px;
+  padding: 0;
+  background: #d7efe9;
+  cursor: pointer;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.cell.is-ship { background: #1f6f62; }
+.cell.is-miss { background: #efe0cf; color: #7a5c48; font-weight: 720; }
+.cell.is-hit { background: var(--adobe); color: #fff6ee; }
+.cell.is-sunk { background: #7a1f28; color: #fff6ee; }
+.cell.is-preview { outline: 2px solid var(--gold); outline-offset: -2px; }
+.cell.is-bad { outline: 2px solid var(--danger); outline-offset: -2px; }
+.cell:disabled { cursor: default; }
+
+.sea-log { min-height: 1.4rem; margin: 0.7rem 0 0; font-weight: 720; }
+
+.c4 {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  max-width: 440px;
+  margin: 0 auto;
+  background: #1f6f62;
+  padding: 10px;
+  border-radius: 18px;
+}
+
+.c4 button {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 50%;
+  background: #fff6ee;
+  cursor: pointer;
+}
+
+.c4 button.is-you { background: var(--gold); }
+.c4 button.is-cpu { background: var(--adobe); }
+
+.mines {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 3px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.mines button {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 6px;
+  background: #e7b089;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.mines button.is-open { background: #fff6ee; }
+.mines button.is-mine { background: var(--clay); color: #fff; }
+.mines button.is-flag { background: var(--gold); }
+
+.snake-wrap { display: grid; justify-items: center; gap: 0.75rem; }
+
+.snake-wrap canvas {
+  width: min(100%, 420px);
+  background: #241410;
+  border-radius: 16px;
+  touch-action: none;
+}
+
+.pad {
+  display: grid;
+  grid-template-columns: 52px 52px 52px;
+  grid-template-areas: ". up ." "left down right";
+  gap: 6px;
+}
+
+.pad button {
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--gold);
+  color: var(--clay);
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.pad-up { grid-area: up; }
+.pad-left { grid-area: left; }
+.pad-down { grid-area: down; }
+.pad-right { grid-area: right; }
+
+.mm-board { display: grid; gap: 0.35rem; max-width: 420px; margin: 0 auto; }
+
+.mm-row { display: flex; gap: 0.35rem; align-items: center; }
+
+.peg {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.peg.is-pick { border-color: var(--ink); }
+
+.mm-pegs { width: 58px; display: grid; grid-template-columns: 14px 14px; gap: 4px; margin-left: 0.35rem; }
+
+.mm-pegs i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #e7d3c0;
+  display: block;
+}
+
+.mm-pegs i.is-exact { background: var(--clay); }
+.mm-pegs i.is-color { background: #fff; box-shadow: inset 0 0 0 1px var(--clay); }
+
+@media (max-width: 720px) {
+  .sea-wrap { grid-template-columns: 1fr; }
 }
 
 .ordo-list li.is-active { background: #ffd7bf; }
