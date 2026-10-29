@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function () {
+  var path = location.pathname;
+  var base = "/";
+  if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
+  window.EP_BASE = base;
+  window.EP = window.EP || {};
+  window.EP.url = function (p) {
+    if (p == null || p === "") return p;
+    if (/^(?:[a-z]+:|\/\/|#|\?)/i.test(p)) return p;
+    var root = window.EP_BASE || "/";
+    if (p.charAt(0) === "/") return root.replace(/\/$/, "") + p;
+    return root + p;
+  };
+  document.write('<base href="' + base + '">');
+})();
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Latin lightning · EP</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main id="game-root"></main>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/games/common.js"></script>
+  <script>
+    const root = document.getElementById("game-root");
+    root.innerHTML = EP.games.shell("Latin lightning");
+    let words = [];
+    let score = 0;
+    let streak = 0;
+    let current = null;
+
+    function meta() {
+      document.getElementById("game-meta").textContent =
+        EP.i18n.t("game_score") + ": " + score + " · streak " + streak + " · " +
+        EP.i18n.t("game_best") + ": " + EP.games.getBest("latin");
+    }
+
+    function vernacular(item) {
+      return EP.i18n.getLang() === "es" ? item.es : item.en;
+    }
+
+    function round() {
+      current = words[Math.floor(Math.random() * words.length)];
+      const showLatin = Math.random() > 0.5;
+      const prompt = showLatin ? current.la : vernacular(current);
+      const answer = showLatin ? vernacular(current) : current.la;
+      const distractors = EP.games
+        .shuffle(words.filter((w) => w !== current))
+        .slice(0, 3)
+        .map((w) => (showLatin ? vernacular(w) : w.la));
+      const choices = EP.games.shuffle([answer, ...distractors]);
+      document.getElementById("game-board").innerHTML = `
+        <div class="flash-card">
+          <div class="prompt">${prompt}</div>
+          <div class="choice-row" id="choices"></div>
+        </div>`;
+      const box = document.getElementById("choices");
+      choices.forEach((c) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = c;
+        btn.addEventListener("click", () => {
+          if (c === answer) {
+            streak++;
+            score += 1 + Math.floor(streak / 3);
+            EP.games.setBest("latin", score);
+            meta();
+            round();
+          } else {
+            streak = 0;
+            meta();
+            document.getElementById("game-board").innerHTML =
+              `<div class="flash-card"><div class="prompt">${EP.i18n.t("game_score")}: ${score}</div></div>`;
+          }
+        });
+        box.appendChild(btn);
+      });
+    }
+
+    function startGame() {
+      score = 0;
+      streak = 0;
+      meta();
+      round();
+    }
+
+    document.getElementById("game-actions").innerHTML =
+      `<button class="btn" id="start-btn" data-i18n="game_start"></button>`;
+    EP.i18n.apply();
+    document.getElementById("start-btn").addEventListener("click", startGame);
+
+    EP.api.get("/api/games").then((data) => {
+      words = data.latin || [];
+      meta();
+      startGame();
+    });
+    window.addEventListener("ep:lang", () => { if (current) round(); });
+  </script>
+</body>
+</html>

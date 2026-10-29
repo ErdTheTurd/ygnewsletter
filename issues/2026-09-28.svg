@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="640" viewBox="0 0 480 640">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#152238"/>
-      <stop offset="100%" stop-color="#3d2a22"/>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1b4068"/>
+      <stop offset="55%" stop-color="#c4523a"/>
+      <stop offset="100%" stop-color="#f2b34a"/>
     </linearGradient>
   </defs>
-  <rect width="480" height="640" fill="url(#g)"/>
-  <rect x="28" y="28" width="424" height="584" fill="none" stroke="#b8973a" stroke-width="2"/>
-  <text x="240" y="220" text-anchor="middle" font-family="Georgia, serif" font-size="72" fill="#e8e0d4">EP</text>
-  <text x="240" y="280" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#b8973a">NEWSLETTER</text>
-  <text x="240" y="360" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#c9b8a8">28 September 2026</text>
-  <text x="240" y="560" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#8a7a6a">Immaculate Conception · El Paso</text>
+  <rect width="480" height="640" rx="28" fill="url(#sky)"/>
+  <circle cx="360" cy="150" r="74" fill="#ffd78a"/>
+  <path d="M0 430 L90 360 L180 410 L280 300 L380 390 L480 320 L480 640 L0 640 Z" fill="#1d2c3c" opacity="0.9"/>
+  <text x="40" y="78" font-family="Georgia, serif" font-size="18" fill="#fff6ee" letter-spacing="2">EP</text>
+  <text x="40" y="250" font-family="Georgia, serif" font-size="58" fill="#fffaf6">St. Michael</text>
+  <text x="40" y="292" font-family="Georgia, serif" font-size="24" fill="#ffe0c2">San Miguel</text>
+  <text x="40" y="590" font-family="Georgia, serif" font-size="18" fill="#ffe7d4">28 September</text>
 </svg>

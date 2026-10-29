@@ -23,8 +23,8 @@
         const tiles = byYear[year]
           .map(
             (issue) => `
-          <a class="cover-tile" href="/issue?id=${encodeURIComponent(issue.id)}">
-            <div class="cover">${issue.cover ? `<img src="/issues/${issue.cover}" alt="">` : ""}</div>
+          <a class="cover-tile" href="${window.EP.url("/issue.html?id=" + encodeURIComponent(issue.id))}">
+            <div class="cover">${issue.cover ? `<img src="${window.EP.url("/issues/" + issue.cover)}" alt="">` : ""}</div>
             <div class="cover-tile__meta">
               <strong>${window.EP.i18n.pick(issue.title)}</strong>
               <span>${formatDate(issue.date)}</span>

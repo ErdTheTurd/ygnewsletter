@@ -28,15 +28,15 @@
     }
 
     if (cover) {
-      cover.href = "/issue?id=" + encodeURIComponent(latest.id);
+      cover.href = window.EP.url("/issue.html?id=" + encodeURIComponent(latest.id));
       cover.innerHTML = latest.cover
-        ? `<img src="/issues/${latest.cover}" alt="">`
+        ? `<img src="${window.EP.url("/issues/" + latest.cover)}" alt="">`
         : "";
     }
     if (meta) {
       meta.innerHTML = `<strong>${window.EP.i18n.pick(latest.title)}</strong><span>${formatDate(latest.date)}</span>`;
     }
-    if (cta) cta.href = "/issue?id=" + encodeURIComponent(latest.id);
+    if (cta) cta.href = window.EP.url("/issue.html?id=" + encodeURIComponent(latest.id));
 
     const blurb = window.EP.i18n.pick(homeData.fromIssue);
     const wrap = document.getElementById("from-issue-wrap");
@@ -47,6 +47,24 @@
       } else {
         wrap.hidden = true;
       }
+    }
+
+    const rack = document.getElementById("more-issues");
+    const rackSection = document.getElementById("rack");
+    if (rack && rackSection) {
+      const rest = (issuesData.issues || []).slice(1);
+      rackSection.hidden = rest.length === 0;
+      rack.innerHTML = rest
+        .map((issue) => {
+          const img = issue.cover
+            ? `<img src="${window.EP.url("/issues/" + issue.cover)}" alt="">`
+            : "";
+          return `<a class="cover-tile" href="${window.EP.url("/issue.html?id=" + encodeURIComponent(issue.id))}">
+            <div class="cover">${img}</div>
+            <div class="cover-tile__meta"><strong>${window.EP.i18n.pick(issue.title)}</strong><span>${formatDate(issue.date)}</span></div>
+          </a>`;
+        })
+        .join("");
     }
   }
 

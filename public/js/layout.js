@@ -1,16 +1,26 @@
 (function () {
-  const PATH = location.pathname.replace(/\/$/, "") || "/";
+  function currentPath() {
+    const base = (window.EP_BASE || "/").replace(/\/$/, "");
+    let path = location.pathname;
+    if (base && path.indexOf(base) === 0) path = path.slice(base.length) || "/";
+    path = path.replace(/\.html$/, "");
+    if (path.length > 1 && path.endsWith("/")) path = path.slice(0, -1);
+    if (path === "/index") path = "/";
+    return path || "/";
+  }
+
+  const PATH = currentPath();
 
   function navItems() {
     return [
       { href: "/", key: "nav_home", match: "/" },
-      { href: "/archive", key: "nav_archive", match: "/archive" },
-      { href: "/events", key: "nav_events", match: "/events" },
-      { href: "/about", key: "nav_about", match: "/about" },
-      { href: "/youth", key: "nav_youth", match: "/youth" },
-      { href: "/groups", key: "nav_groups", match: "/groups" },
-      { href: "/games", key: "nav_games", match: "/games" },
-      { href: "/find-us", key: "nav_find", match: "/find-us" },
+      { href: "/archive.html", key: "nav_archive", match: "/archive" },
+      { href: "/events.html", key: "nav_events", match: "/events" },
+      { href: "/about.html", key: "nav_about", match: "/about" },
+      { href: "/youth.html", key: "nav_youth", match: "/youth" },
+      { href: "/groups.html", key: "nav_groups", match: "/groups" },
+      { href: "/games.html", key: "nav_games", match: "/games" },
+      { href: "/find-us.html", key: "nav_find", match: "/find-us" },
     ];
   }
 
@@ -23,13 +33,13 @@
           item.match === "/"
             ? PATH === "/"
             : PATH === item.match || PATH.startsWith(item.match + "/");
-        return `<a href="${item.href}" data-i18n="${item.key}"${current ? ' aria-current="page"' : ""}></a>`;
+        return `<a href="${window.EP.url(item.href)}" data-i18n="${item.key}"${current ? ' aria-current="page"' : ""}></a>`;
       })
       .join("");
 
     header.innerHTML = `
       <div class="site-header__inner">
-        <a class="brand" href="/">E<span>P</span></a>
+        <a class="brand" href="${window.EP.url("/")}"><span class="brand__mark">EP</span><span class="brand__word">Newsletter</span></a>
         <button type="button" class="menu-btn" id="menu-btn" data-i18n="menu">Menu</button>
         <nav class="nav" id="site-nav">${links}
           <div class="lang-toggle" role="group" aria-label="Language">

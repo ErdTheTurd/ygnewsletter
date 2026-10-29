@@ -192,7 +192,8 @@ for (const page of pages) {
 }
 
 app.get("/games/:slug", (req, res) => {
-  const file = path.join(PUBLIC, "games", `${req.params.slug}.html`);
+  const slug = String(req.params.slug || "").replace(/\.html$/, "");
+  const file = path.join(PUBLIC, "games", `${slug}.html`);
   if (fs.existsSync(file)) return res.sendFile(file);
   res.status(404).sendFile(path.join(PUBLIC, "404.html"));
 });
