@@ -28,27 +28,21 @@
   <a class="skip" href="#main">Skip</a>
   <header class="site-header" id="site-header"></header>
   <main id="main">
-    <section class="hero">
-      <div class="hero__media" role="img" aria-label="El Paso dusk over the parish"></div>
-      <div class="hero__content">
-        <h1 class="hero__brand">E<em>P</em></h1>
-        <p class="hero__line" id="hero-tagline"></p>
-        <div class="btn-row">
-          <a class="btn" id="cta-current" href="archive.html" data-i18n="cta_current">Open current issue</a>
-          <a class="btn btn--ghost" href="archive.html" data-i18n="cta_archive">Archive</a>
-        </div>
-      </div>
-    </section>
-    <section class="section">
-      <h2 class="section__title" data-i18n="latest_title">Current issue</h2>
+    <section class="section front">
+      <p class="dek" id="hero-tagline"></p>
+      <h1 class="section__title" data-i18n="latest_title">Current issue</h1>
       <hr class="section__rule">
       <div class="latest">
         <a class="cover" id="latest-cover" href="archive.html"></a>
-        <div>
+        <div class="latest__copy">
           <div class="cover-tile__meta" id="latest-meta"></div>
-          <div id="from-issue-wrap" hidden style="margin-top:1.5rem">
-            <h3 style="font-family:var(--font-display);margin:0 0 0.5rem;color:var(--gold)" data-i18n="from_issue">From this issue</h3>
+          <div id="from-issue-wrap" hidden>
+            <h2 class="kicker" data-i18n="from_issue">From this issue</h2>
             <p class="prose" id="from-issue"></p>
+          </div>
+          <div class="btn-row">
+            <a class="btn" id="cta-current" href="archive.html" data-i18n="cta_current">Read this issue</a>
+            <a class="btn btn--ghost" href="archive.html" data-i18n="cta_archive">All issues</a>
           </div>
         </div>
       </div>
