@@ -35,9 +35,12 @@
 
   async function unlock(pass) {
     const status = await window.EP.api.checkAuth(pass);
-    if (status !== 200) {
-      const key = status === 401 ? "pass_denied" : "pass_offline";
-      showToast(window.EP.i18n.t(key));
+    if (status === 401) {
+      showToast(window.EP.i18n.t("pass_denied"));
+      return false;
+    }
+    if (status !== 200 && status !== 204) {
+      showToast(window.EP.i18n.t("pass_offline"));
       return false;
     }
     unlocked = true;
@@ -45,6 +48,7 @@
     document.body.classList.add("is-admin");
     ensureBar();
     document.getElementById("admin-bar").classList.add("is-open");
+    if (status === 204) setStatusOk(window.EP.i18n.t("admin_local_open"));
     window.dispatchEvent(new CustomEvent("ep:admin", { detail: { unlocked: true } }));
     if (typeof window.EP.mountAdminPanel === "function") {
       window.EP.mountAdminPanel(document.getElementById("admin-panel-root"));
@@ -69,7 +73,10 @@
     bar.querySelector("#admin-lock").addEventListener("click", lock);
     bar.querySelector("#admin-save").addEventListener("click", () => {
       if (typeof window.EP.saveAdmin === "function") {
-        window.EP.saveAdmin(passphrase).then(setStatusOk).catch(setStatusErr);
+        window.EP.saveAdmin(passphrase).then((msg) => {
+          const extra = window.EP.api.savedLocally ? " " + window.EP.i18n.t("admin_local") : "";
+          setStatusOk((msg || "Saved.") + extra);
+        }).catch(setStatusErr);
       }
     });
     window.EP.i18n.apply();
