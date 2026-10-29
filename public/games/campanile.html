@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Campanile · EP</title>
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main id="game-root"></main>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/admin.js"></script>
+  <script src="/js/layout.js"></script>
+  <script src="/js/games/common.js"></script>
+  <script>
+    const root = document.getElementById("game-root");
+    root.innerHTML = EP.games.shell("Campanile");
+    let cues = [];
+    let score = 0;
+    let lives = 3;
+    let timer = null;
+    let current = null;
+    let waiting = false;
+    let delay = 1600;
+
+    function meta() {
+      document.getElementById("game-meta").textContent =
+        EP.i18n.t("game_score") + ": " + score + " · " + EP.i18n.t("game_best") + ": " + EP.games.getBest("campanile");
+    }
+
+    function showCue() {
+      current = cues[Math.floor(Math.random() * cues.length)];
+      waiting = true;
+      document.getElementById("cue-text").textContent = EP.i18n.pick(current.cue);
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (!waiting) return;
+        waiting = false;
+        if (current.ring) {
+          // missed a feast
+          lives--;
+          if (lives <= 0) endGame();
+          else nextRound();
+        } else {
+          score++;
+          EP.games.setBest("campanile", score);
+          delay = Math.max(700, delay - 40);
+          nextRound();
+        }
+        meta();
+      }, delay);
+    }
+
+    function nextRound() {
+      setTimeout(showCue, 350);
+    }
+
+    function ring() {
+      if (!waiting || !current) return;
+      waiting = false;
+      clearTimeout(timer);
+      if (current.ring) {
+        score++;
+        EP.games.setBest("campanile", score);
+        delay = Math.max(700, delay - 40);
+        nextRound();
+      } else {
+        lives--;
+        if (lives <= 0) endGame();
+        else nextRound();
+      }
+      meta();
+    }
+
+    function endGame() {
+      clearTimeout(timer);
+      document.getElementById("cue-text").textContent = EP.i18n.t("game_score") + ": " + score;
+      waiting = false;
+      current = null;
+    }
+
+    function startGame() {
+      score = 0;
+      lives = 3;
+      delay = 1600;
+      meta();
+      document.getElementById("game-board").innerHTML = `
+        <div class="campanile-stage">
+          <div class="cue" id="cue-text"></div>
+          <button type="button" class="bell-btn" id="bell">Ring</button>
+          <p style="color:var(--muted);margin-top:1rem">Lives: <span id="lives">3</span></p>
+        </div>`;
+      document.getElementById("bell").addEventListener("click", ring);
+      const lifeObs = setInterval(() => {
+        const el = document.getElementById("lives");
+        if (el) el.textContent = String(lives);
+        else clearInterval(lifeObs);
+      }, 100);
+      showCue();
+    }
+
+    document.getElementById("game-actions").innerHTML =
+      `<button class="btn" id="start-btn" data-i18n="game_start"></button>`;
+    EP.i18n.apply();
+    document.getElementById("start-btn").addEventListener("click", startGame);
+
+    EP.api.get("/api/games").then((data) => {
+      cues = data.campanile || [];
+      meta();
+      startGame();
+    });
+  </script>
+</body>
+</html>

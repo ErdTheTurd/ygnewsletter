@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Games · EP Newsletter</title>
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main>
+    <div class="page-hero">
+      <h1 data-i18n="games_title">Games</h1>
+      <hr class="section__rule">
+    </div>
+    <section class="section">
+      <div class="games-grid" id="games-grid">
+        <a class="game-link" href="/games/sanctoral">
+          <h2>Sanctoral match</h2>
+          <p data-game-desc="sanctoral">Match saints to their titles.</p>
+        </a>
+        <a class="game-link" href="/games/ordo">
+          <h2>Ordo scramble</h2>
+          <p data-game-desc="ordo">Put the Low Mass in order.</p>
+        </a>
+        <a class="game-link" href="/games/campanile">
+          <h2>Campanile</h2>
+          <p data-game-desc="campanile">Ring for feasts. Skip the ferias.</p>
+        </a>
+        <a class="game-link" href="/games/vestment-run">
+          <h2>Vestment run</h2>
+          <p data-game-desc="vestment">Catch the right liturgical color.</p>
+        </a>
+        <a class="game-link" href="/games/latin-lightning">
+          <h2>Latin lightning</h2>
+          <p data-game-desc="latin">Flash rounds on Mass Latin.</p>
+        </a>
+        <a class="game-link" href="/games/sacristy-sort">
+          <h2>Sacristy sort</h2>
+          <p data-game-desc="sacristy">Set the altar and credence.</p>
+        </a>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" id="site-footer"></footer>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/admin.js"></script>
+  <script src="/js/layout.js"></script>
+  <script>
+    const DESCS = {
+      en: {
+        sanctoral: "Match saints to their titles.",
+        ordo: "Put the Low Mass in order.",
+        campanile: "Ring for feasts. Skip the ferias.",
+        vestment: "Catch the right liturgical color.",
+        latin: "Flash rounds on Mass Latin.",
+        sacristy: "Set the altar and credence."
+      },
+      es: {
+        sanctoral: "Empareja santos con sus títulos.",
+        ordo: "Ordena las partes de la Misa rezada.",
+        campanile: "Toca en las fiestas. Omite las ferias.",
+        vestment: "Atrapa el color litúrgico correcto.",
+        latin: "Rondas rápidas de latín de la Misa.",
+        sacristy: "Prepara el altar y la credencia."
+      }
+    };
+    function applyGameDesc() {
+      const lang = EP.i18n.getLang();
+      document.querySelectorAll("[data-game-desc]").forEach((el) => {
+        el.textContent = DESCS[lang][el.dataset.gameDesc] || DESCS.en[el.dataset.gameDesc];
+      });
+    }
+    applyGameDesc();
+    window.addEventListener("ep:lang", applyGameDesc);
+  </script>
+</body>
+</html>
