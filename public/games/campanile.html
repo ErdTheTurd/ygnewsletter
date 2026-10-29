@@ -4,6 +4,14 @@
 <script>
 (function () {
   var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
   var base = "/";
   if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
   window.EP_BASE = base;
@@ -44,7 +52,8 @@
 
     function meta() {
       document.getElementById("game-meta").textContent =
-        EP.i18n.t("game_score") + ": " + score + " · " + EP.i18n.t("game_best") + ": " + EP.games.getBest("campanile");
+        EP.i18n.t("game_score") + ": " + score + " · ♥ " + lives + " · " +
+        EP.i18n.t("game_best") + ": " + EP.games.getBest("campanile");
     }
 
     function showCue() {
@@ -107,14 +116,8 @@
         <div class="campanile-stage">
           <div class="cue" id="cue-text"></div>
           <button type="button" class="bell-btn" id="bell">Ring</button>
-          <p style="color:var(--muted);margin-top:1rem">Lives: <span id="lives">3</span></p>
         </div>`;
       document.getElementById("bell").addEventListener("click", ring);
-      const lifeObs = setInterval(() => {
-        const el = document.getElementById("lives");
-        if (el) el.textContent = String(lives);
-        else clearInterval(lifeObs);
-      }, 100);
       showCue();
     }
 

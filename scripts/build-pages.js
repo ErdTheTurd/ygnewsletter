@@ -48,4 +48,24 @@ fs.writeFileSync(
 );
 fs.writeFileSync(path.join(root, ".nojekyll"), "");
 
+const htmlPages = ["archive", "issue", "events", "about", "youth", "groups", "games", "find-us"];
+for (const page of htmlPages) {
+  const src = path.join(root, `${page}.html`);
+  if (!fs.existsSync(src)) continue;
+  const dir = path.join(root, page);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.copyFileSync(src, path.join(dir, "index.html"));
+}
+
+const builtGames = path.join(root, "games");
+if (fs.existsSync(builtGames)) {
+  for (const name of fs.readdirSync(builtGames)) {
+    if (!name.endsWith(".html") || name === "index.html") continue;
+    const slug = name.replace(/\.html$/, "");
+    const dir = path.join(builtGames, slug);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.copyFileSync(path.join(builtGames, name), path.join(dir, "index.html"));
+  }
+}
+
 console.log("Wrote GitHub Pages files at the repository root");

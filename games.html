@@ -4,6 +4,14 @@
 <script>
 (function () {
   var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
   var base = "/";
   if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
   window.EP_BASE = base;
@@ -31,28 +39,44 @@
       <hr class="section__rule">
     </div>
     <section class="section">
-      <div class="games-grid" id="games-grid">
-        <a class="game-link" href="games/sanctoral.html">
+      <h2 class="kicker" data-i18n="games_fun">Just for fun</h2>
+      <div class="games-grid">
+        <a class="game-link" href="games/tic-tac-toe">
+          <h2>Tic-tac-toe</h2>
+          <p data-game-desc="ttt">Play the computer. It does not go easy.</p>
+        </a>
+        <a class="game-link" href="games/scramble">
+          <h2>Word scramble</h2>
+          <p data-game-desc="scramble">Unscramble a word before the next one.</p>
+        </a>
+        <a class="game-link" href="games/memory">
+          <h2>Memory</h2>
+          <p data-game-desc="memory">Flip cards and find the pairs.</p>
+        </a>
+      </div>
+      <h2 class="kicker" data-i18n="games_parish">For Mass</h2>
+      <div class="games-grid">
+        <a class="game-link" href="games/sanctoral">
           <h2>Sanctoral match</h2>
           <p data-game-desc="sanctoral">Match saints to their titles.</p>
         </a>
-        <a class="game-link" href="games/ordo.html">
+        <a class="game-link" href="games/ordo">
           <h2>Ordo scramble</h2>
           <p data-game-desc="ordo">Put the Low Mass in order.</p>
         </a>
-        <a class="game-link" href="games/campanile.html">
+        <a class="game-link" href="games/campanile">
           <h2>Campanile</h2>
           <p data-game-desc="campanile">Ring for feasts. Skip the ferias.</p>
         </a>
-        <a class="game-link" href="games/vestment-run.html">
+        <a class="game-link" href="games/vestment-run">
           <h2>Vestment run</h2>
           <p data-game-desc="vestment">Catch the right liturgical color.</p>
         </a>
-        <a class="game-link" href="games/latin-lightning.html">
+        <a class="game-link" href="games/latin-lightning">
           <h2>Latin lightning</h2>
           <p data-game-desc="latin">Flash rounds on Mass Latin.</p>
         </a>
-        <a class="game-link" href="games/sacristy-sort.html">
+        <a class="game-link" href="games/sacristy-sort">
           <h2>Sacristy sort</h2>
           <p data-game-desc="sacristy">Set the altar and credence.</p>
         </a>
@@ -72,7 +96,10 @@
         campanile: "Ring for feasts. Skip the ferias.",
         vestment: "Catch the right liturgical color.",
         latin: "Flash rounds on Mass Latin.",
-        sacristy: "Set the altar and credence."
+        sacristy: "Set the altar and credence.",
+        ttt: "Play the computer. It does not go easy.",
+        scramble: "Unscramble a word before the next one.",
+        memory: "Flip cards and find the pairs."
       },
       es: {
         sanctoral: "Empareja santos con sus títulos.",
@@ -80,7 +107,10 @@
         campanile: "Toca en las fiestas. Omite las ferias.",
         vestment: "Atrapa el color litúrgico correcto.",
         latin: "Rondas rápidas de latín de la Misa.",
-        sacristy: "Prepara el altar y la credencia."
+        sacristy: "Prepara el altar y la credencia.",
+        ttt: "Juega contra la computadora. No se deja ganar.",
+        scramble: "Ordena las letras antes de la siguiente.",
+        memory: "Voltea cartas y encuentra las parejas."
       }
     };
     function applyGameDesc() {

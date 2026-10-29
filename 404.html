@@ -4,6 +4,14 @@
 <script>
 (function () {
   var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
   var base = "/";
   if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
   window.EP_BASE = base;
@@ -28,7 +36,7 @@
   <main class="section">
     <h1 class="section__title">404</h1>
     <hr class="section__rule">
-    <p><a href="index.html">EP Newsletter</a></p>
+    <p><a href="./">EP Newsletter</a></p>
   </main>
   <script src="js/i18n.js"></script>
   <script src="js/layout.js"></script>

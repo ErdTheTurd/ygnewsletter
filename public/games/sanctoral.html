@@ -4,6 +4,14 @@
 <script>
 (function () {
   var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
   var base = "/";
   if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
   window.EP_BASE = base;
@@ -91,10 +99,18 @@
           const ms = Date.now() - start;
           EP.games.setBestTime("sanctoral", ms);
           updateMeta();
+          document.getElementById("game-meta").textContent +=
+            " · " + (ms / 1000).toFixed(1) + "s";
         }
       } else {
-        selected.classList.remove("is-selected");
+        const first = selected;
+        first.classList.add("is-wrong");
+        btn.classList.add("is-wrong");
         selected = null;
+        setTimeout(() => {
+          first.classList.remove("is-wrong", "is-selected");
+          btn.classList.remove("is-wrong");
+        }, 420);
       }
     }
 

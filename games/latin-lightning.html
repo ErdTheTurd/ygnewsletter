@@ -4,6 +4,14 @@
 <script>
 (function () {
   var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
   var base = "/";
   if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
   window.EP_BASE = base;
@@ -37,12 +45,13 @@
     let words = [];
     let score = 0;
     let streak = 0;
+    let lives = 3;
     let current = null;
 
     function meta() {
       document.getElementById("game-meta").textContent =
-        EP.i18n.t("game_score") + ": " + score + " · streak " + streak + " · " +
-        EP.i18n.t("game_best") + ": " + EP.games.getBest("latin");
+        EP.i18n.t("game_score") + ": " + score + " · streak " + streak +
+        " · ♥ " + lives + " · " + EP.i18n.t("game_best") + ": " + EP.games.getBest("latin");
     }
 
     function vernacular(item) {
@@ -78,9 +87,16 @@
             round();
           } else {
             streak = 0;
+            lives--;
+            box.querySelectorAll("button").forEach((b) => { b.disabled = true; });
+            btn.classList.add("is-wrong");
             meta();
-            document.getElementById("game-board").innerHTML =
-              `<div class="flash-card"><div class="prompt">${EP.i18n.t("game_score")}: ${score}</div></div>`;
+            if (lives <= 0) {
+              document.getElementById("game-board").innerHTML =
+                `<div class="flash-card"><div class="prompt">${answer}</div><p>${EP.i18n.t("game_score")}: ${score}</p></div>`;
+            } else {
+              setTimeout(round, 700);
+            }
           }
         });
         box.appendChild(btn);
@@ -90,6 +106,7 @@
     function startGame() {
       score = 0;
       streak = 0;
+      lives = 3;
       meta();
       round();
     }

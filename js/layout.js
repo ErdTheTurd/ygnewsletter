@@ -14,13 +14,10 @@
   function navItems() {
     return [
       { href: "/", key: "nav_home", match: "/" },
-      { href: "/archive.html", key: "nav_archive", match: "/archive" },
-      { href: "/events.html", key: "nav_events", match: "/events" },
-      { href: "/about.html", key: "nav_about", match: "/about" },
-      { href: "/youth.html", key: "nav_youth", match: "/youth" },
-      { href: "/groups.html", key: "nav_groups", match: "/groups" },
-      { href: "/games.html", key: "nav_games", match: "/games" },
-      { href: "/find-us.html", key: "nav_find", match: "/find-us" },
+      { href: "/archive", key: "nav_archive", match: "/archive" },
+      { href: "/events", key: "nav_events", match: "/events" },
+      { href: "/about", key: "nav_about", match: "/about" },
+      { href: "/games", key: "nav_games", match: "/games" },
     ];
   }
 

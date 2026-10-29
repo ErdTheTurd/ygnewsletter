@@ -4,6 +4,14 @@
 <script>
 (function () {
   var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
   var base = "/";
   if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
   window.EP_BASE = base;
@@ -28,7 +36,7 @@
   <main class="reader">
     <div class="reader__bar">
       <div>
-        <a href="archive.html" data-i18n="back_archive">Back to archive</a>
+        <a href="archive" data-i18n="back_archive">Back to archive</a>
         <strong id="issue-title" style="display:block;font-family:var(--font-display);margin-top:0.25rem"></strong>
       </div>
       <a class="btn" id="issue-download" href="#" data-i18n="download">Download PDF</a>

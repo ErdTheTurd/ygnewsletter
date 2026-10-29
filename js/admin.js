@@ -17,9 +17,29 @@
     window.dispatchEvent(new CustomEvent("ep:admin", { detail: { unlocked: false } }));
   }
 
+  function showToast(message) {
+    let toast = document.getElementById("pass-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "pass-toast";
+      toast.className = "pass-toast";
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.hidden = false;
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => {
+      toast.hidden = true;
+    }, 4200);
+  }
+
   async function unlock(pass) {
-    const ok = await window.EP.api.checkAuth(pass);
-    if (!ok) return false;
+    const status = await window.EP.api.checkAuth(pass);
+    if (status !== 200) {
+      const key = status === 401 ? "pass_denied" : "pass_offline";
+      showToast(window.EP.i18n.t(key));
+      return false;
+    }
     unlocked = true;
     passphrase = pass;
     document.body.classList.add("is-admin");
@@ -80,7 +100,7 @@
       return;
     }
     if (e.key.length !== 1) return;
-    buffer += e.key.toLowerCase();
+    buffer = (buffer + e.key.toLowerCase()).replace(/[^a-z]/g, "");
     if (buffer.length > SEQUENCE.length) buffer = buffer.slice(-SEQUENCE.length);
     if (buffer === SEQUENCE) {
       buffer = "";
