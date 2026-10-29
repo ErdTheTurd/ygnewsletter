@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e3a55"/>
+      <stop offset="45%" stop-color="#2a3d4f"/>
+      <stop offset="75%" stop-color="#5a3a2c"/>
+      <stop offset="100%" stop-color="#1a1410"/>
+    </linearGradient>
+    <linearGradient id="mount" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2c3e4a"/>
+      <stop offset="100%" stop-color="#1a2228"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="70%" cy="42%" r="18%">
+      <stop offset="0%" stop-color="#e0a45a" stop-opacity="0.85"/>
+      <stop offset="45%" stop-color="#c06a3a" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#c06a3a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <ellipse cx="1340" cy="430" rx="320" ry="220" fill="url(#sun)"/>
+  <path d="M0 620 L220 480 L420 560 L680 400 L920 520 L1180 380 L1400 500 L1680 420 L1920 560 L1920 1080 L0 1080 Z" fill="url(#mount)" opacity="0.9"/>
+  <path d="M0 720 L300 600 L560 680 L860 540 L1120 660 L1480 560 L1920 700 L1920 1080 L0 1080 Z" fill="#24303a" opacity="0.85"/>
+  <!-- church silhouette -->
+  <g transform="translate(780 470)" fill="#121820">
+    <rect x="80" y="120" width="220" height="220"/>
+    <polygon points="80,120 190,40 300,120"/>
+    <rect x="170" y="0" width="40" height="70"/>
+    <rect x="155" y="55" width="70" height="18"/>
+    <rect x="40" y="180" width="60" height="160"/>
+    <rect x="280" y="180" width="60" height="160"/>
+    <rect x="165" y="200" width="50" height="140" fill="#1a2430"/>
+  </g>
+  <rect x="0" y="900" width="1920" height="180" fill="#0c1016" opacity="0.55"/>
+</svg>

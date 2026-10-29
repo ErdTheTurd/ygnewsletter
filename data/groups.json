@@ -1,0 +1,24 @@
+{
+  "groups": [
+    {
+      "id": "schola",
+      "name": { "en": "", "es": "" },
+      "body": { "en": "", "es": "" }
+    },
+    {
+      "id": "servers",
+      "name": { "en": "", "es": "" },
+      "body": { "en": "", "es": "" }
+    },
+    {
+      "id": "altar-society",
+      "name": { "en": "", "es": "" },
+      "body": { "en": "", "es": "" }
+    },
+    {
+      "id": "youth",
+      "name": { "en": "", "es": "" },
+      "body": { "en": "", "es": "" }
+    }
+  ]
+}

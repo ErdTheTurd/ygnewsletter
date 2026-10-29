@@ -1,0 +1,80 @@
+{
+  "sanctoral": [
+    { "name": { "en": "St. Joseph", "es": "San José" }, "attr": { "en": "Spouse of the Blessed Virgin", "es": "Esposo de la Santísima Virgen" } },
+    { "name": { "en": "St. Peter", "es": "San Pedro" }, "attr": { "en": "Prince of the Apostles", "es": "Príncipe de los Apóstoles" } },
+    { "name": { "en": "St. Paul", "es": "San Pablo" }, "attr": { "en": "Apostle to the Gentiles", "es": "Apóstol de los gentiles" } },
+    { "name": { "en": "St. Michael", "es": "San Miguel" }, "attr": { "en": "Prince of the heavenly host", "es": "Príncipe de la milicia celestial" } },
+    { "name": { "en": "St. Teresa of Avila", "es": "Santa Teresa de Ávila" }, "attr": { "en": "Doctor of the Church, reformer of Carmel", "es": "Doctora de la Iglesia, reformadora del Carmelo" } },
+    { "name": { "en": "St. Thomas Aquinas", "es": "Santo Tomás de Aquino" }, "attr": { "en": "Angelic Doctor", "es": "Doctor Angélico" } },
+    { "name": { "en": "St. Francis of Assisi", "es": "San Francisco de Asís" }, "attr": { "en": "Founder of the Friars Minor", "es": "Fundador de los frailes menores" } },
+    { "name": { "en": "St. Clare", "es": "Santa Clara" }, "attr": { "en": "Foundress of the Poor Clares", "es": "Fundadora de las Clarisas" } }
+  ],
+  "ordo": [
+    { "en": "Asperges / Prayers at the Foot of the Altar", "es": "Asperges / Oraciones al pie del altar" },
+    { "en": "Introit", "es": "Introito" },
+    { "en": "Kyrie", "es": "Kyrie" },
+    { "en": "Gloria", "es": "Gloria" },
+    { "en": "Collect", "es": "Colecta" },
+    { "en": "Epistle", "es": "Epístola" },
+    { "en": "Gradual / Alleluia", "es": "Gradual / Aleluya" },
+    { "en": "Gospel", "es": "Evangelio" },
+    { "en": "Credo", "es": "Credo" },
+    { "en": "Offertory", "es": "Ofertorio" },
+    { "en": "Secret", "es": "Secreta" },
+    { "en": "Preface / Sanctus", "es": "Prefacio / Sanctus" },
+    { "en": "Canon", "es": "Canon" },
+    { "en": "Pater Noster", "es": "Pater Noster" },
+    { "en": "Agnus Dei", "es": "Agnus Dei" },
+    { "en": "Communion", "es": "Comunión" },
+    { "en": "Postcommunion", "es": "Poscomunión" },
+    { "en": "Last Gospel", "es": "Último Evangelio" }
+  ],
+  "latin": [
+    { "la": "Dominus vobiscum", "en": "The Lord be with you", "es": "El Señor esté con vosotros" },
+    { "la": "Et cum spiritu tuo", "en": "And with thy spirit", "es": "Y con tu espíritu" },
+    { "la": "Oremus", "en": "Let us pray", "es": "Oremos" },
+    { "la": "Agnus Dei", "en": "Lamb of God", "es": "Cordero de Dios" },
+    { "la": "Sanctus", "en": "Holy", "es": "Santo" },
+    { "la": "Gloria in excelsis Deo", "en": "Glory to God in the highest", "es": "Gloria a Dios en el cielo" },
+    { "la": "Credo", "en": "I believe", "es": "Creo" },
+    { "la": "Pater Noster", "en": "Our Father", "es": "Padre Nuestro" },
+    { "la": "Ave Maria", "en": "Hail Mary", "es": "Ave María" },
+    { "la": "Deo gratias", "en": "Thanks be to God", "es": "Gracias a Dios" },
+    { "la": "Ite, missa est", "en": "Go, the Mass is ended", "es": "Id, la Misa ha terminado" },
+    { "la": "Kyrie eleison", "en": "Lord, have mercy", "es": "Señor, ten piedad" }
+  ],
+  "campanile": [
+    { "cue": { "en": "Feast of St. Joseph", "es": "Fiesta de San José" }, "ring": true },
+    { "cue": { "en": "Feria", "es": "Feria" }, "ring": false },
+    { "cue": { "en": "Assumption of Mary", "es": "Asunción de María" }, "ring": true },
+    { "cue": { "en": "Ordinary weekday", "es": "Día ordinario" }, "ring": false },
+    { "cue": { "en": "Christ the King", "es": "Cristo Rey" }, "ring": true },
+    { "cue": { "en": "Feria of Lent", "es": "Feria de Cuaresma" }, "ring": false },
+    { "cue": { "en": "All Saints", "es": "Todos los Santos" }, "ring": true },
+    { "cue": { "en": "Simple feria", "es": "Feria simple" }, "ring": false }
+  ],
+  "vestments": [
+    { "feast": { "en": "Christmas", "es": "Navidad" }, "color": "white" },
+    { "feast": { "en": "Pentecost", "es": "Pentecostés" }, "color": "red" },
+    { "feast": { "en": "Ordinary Sunday", "es": "Domingo ordinario" }, "color": "green" },
+    { "feast": { "en": "Good Friday", "es": "Viernes Santo" }, "color": "black" },
+    { "feast": { "en": "Advent Sunday", "es": "Domingo de Adviento" }, "color": "violet" },
+    { "feast": { "en": "Martyr's feast", "es": "Fiesta de mártir" }, "color": "red" },
+    { "feast": { "en": "Easter", "es": "Pascua" }, "color": "white" },
+    { "feast": { "en": "Requiem Mass", "es": "Misa de réquiem" }, "color": "black" },
+    { "feast": { "en": "Laetare Sunday", "es": "Domingo Laetare" }, "color": "rose" },
+    { "feast": { "en": "Epiphany", "es": "Epifanía" }, "color": "white" }
+  ],
+  "sacristy": {
+    "items": [
+      { "id": "chalice", "label": { "en": "Chalice", "es": "Cáliz" }, "zone": "altar" },
+      { "id": "paten", "label": { "en": "Paten", "es": "Patena" }, "zone": "altar" },
+      { "id": "missal", "label": { "en": "Missal", "es": "Misal" }, "zone": "altar" },
+      { "id": "cruets", "label": { "en": "Cruets", "es": "Vinajeras" }, "zone": "credence" },
+      { "id": "lavabo", "label": { "en": "Lavabo bowl", "es": "Lavabo" }, "zone": "credence" },
+      { "id": "finger-towel", "label": { "en": "Finger towel", "es": "Purificador de manos" }, "zone": "credence" },
+      { "id": "corporal", "label": { "en": "Corporal", "es": "Corporal" }, "zone": "altar" },
+      { "id": "purificator", "label": { "en": "Purificator", "es": "Purificador" }, "zone": "altar" }
+    ]
+  }
+}

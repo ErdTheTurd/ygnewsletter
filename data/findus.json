@@ -1,0 +1,21 @@
+{
+  "name": {
+    "en": "Immaculate Conception Church",
+    "es": "Iglesia de la Inmaculada Concepción"
+  },
+  "address": "118 N Campbell St, El Paso, TX 79901",
+  "phone": "(915) 533-3427",
+  "fax": "(915) 533-3228",
+  "email": "ic.ecclesia@proton.me",
+  "hours": {
+    "en": "Monday to Thursday 9am to 4:30pm. Friday 9am to 4pm.",
+    "es": "Lunes a jueves de 9am a 4:30pm. Viernes de 9am a 4pm."
+  },
+  "printed": {
+    "en": "Printed newsletters are available at the church after Mass.",
+    "es": "Los boletines impresos están disponibles en la iglesia después de la Misa."
+  },
+  "parishSite": "https://www.fsspelpaso.com/",
+  "mapUrl": "https://maps.google.com/?q=118+N+Campbell+St,+El+Paso,+TX+79901",
+  "notes": { "en": "", "es": "" }
+}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sanctoral match · EP</title>
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main id="game-root"></main>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/admin.js"></script>
+  <script src="/js/layout.js"></script>
+  <script src="/js/games/common.js"></script>
+  <script>
+    const root = document.getElementById("game-root");
+    root.innerHTML = EP.games.shell("Sanctoral match");
+    let deck = [];
+    let selected = null;
+    let matched = 0;
+    let start = 0;
+
+    function label(side, item) {
+      return side === "name" ? EP.i18n.pick(item.name) : EP.i18n.pick(item.attr);
+    }
+
+    function updateMeta() {
+      const best = EP.games.getBestTime("sanctoral");
+      document.getElementById("game-meta").textContent =
+        EP.i18n.t("game_best") + ": " + (best ? (best / 1000).toFixed(1) + "s" : "-");
+    }
+
+    function startGame() {
+      matched = 0;
+      selected = null;
+      start = Date.now();
+      const pairs = EP.games.shuffle(deck).slice(0, 6);
+      const cards = EP.games.shuffle([
+        ...pairs.map((p, i) => ({ id: "n" + i, pair: i, side: "name", item: p })),
+        ...pairs.map((p, i) => ({ id: "a" + i, pair: i, side: "attr", item: p })),
+      ]);
+      const board = document.getElementById("game-board");
+      board.innerHTML = '<div class="match-grid"></div>';
+      const grid = board.firstChild;
+      cards.forEach((card) => {
+        const btn = document.createElement("button");
+        btn.className = "match-card";
+        btn.type = "button";
+        btn.textContent = label(card.side, card.item);
+        btn.dataset.pair = card.pair;
+        btn.dataset.id = card.id;
+        btn.addEventListener("click", () => onPick(btn));
+        grid.appendChild(btn);
+      });
+    }
+
+    function onPick(btn) {
+      if (btn.classList.contains("is-matched")) return;
+      if (!selected) {
+        selected = btn;
+        btn.classList.add("is-selected");
+        return;
+      }
+      if (selected === btn) return;
+      if (selected.dataset.pair === btn.dataset.pair && selected.dataset.id !== btn.dataset.id) {
+        selected.classList.add("is-matched");
+        btn.classList.add("is-matched");
+        selected.classList.remove("is-selected");
+        selected = null;
+        matched++;
+        if (matched >= 6) {
+          const ms = Date.now() - start;
+          EP.games.setBestTime("sanctoral", ms);
+          updateMeta();
+        }
+      } else {
+        selected.classList.remove("is-selected");
+        selected = null;
+      }
+    }
+
+    document.getElementById("game-actions").innerHTML =
+      `<button class="btn" id="start-btn" data-i18n="game_start"></button>`;
+    EP.i18n.apply();
+    document.getElementById("start-btn").addEventListener("click", startGame);
+
+    EP.api.get("/api/games").then((data) => {
+      deck = data.sanctoral || [];
+      updateMeta();
+      startGame();
+    });
+    window.addEventListener("ep:lang", () => { updateMeta(); startGame(); });
+  </script>
+</body>
+</html>

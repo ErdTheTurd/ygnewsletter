@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Issue · EP Newsletter</title>
+  <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main class="reader">
+    <div class="reader__bar">
+      <div>
+        <a href="/archive" data-i18n="back_archive">Back to archive</a>
+        <strong id="issue-title" style="display:block;font-family:var(--font-display);margin-top:0.25rem"></strong>
+      </div>
+      <a class="btn" id="issue-download" href="#" data-i18n="download">Download PDF</a>
+    </div>
+    <p id="issue-missing" class="empty" hidden data-i18n="reader_missing" style="margin:2rem"></p>
+    <iframe class="reader__frame" id="issue-frame" title="Newsletter PDF"></iframe>
+  </main>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/admin.js"></script>
+  <script src="/js/layout.js"></script>
+  <script src="/js/pages/issue.js"></script>
+</body>
+</html>
