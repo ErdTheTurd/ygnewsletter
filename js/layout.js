@@ -39,7 +39,7 @@
 
     header.innerHTML = `
       <div class="site-header__inner">
-        <a class="brand" href="${window.EP.url("/")}"><span class="brand__parish">Immaculate Conception · FSSP</span>EP Newsletter</a>
+        <a class="brand" href="${window.EP.url("/")}"><span class="brand__mark">EP</span><span class="brand__word">Newsletter</span></a>
         <button type="button" class="menu-btn" id="menu-btn" data-i18n="menu">Menu</button>
         <nav class="nav" id="site-nav">${links}
           <div class="lang-toggle" role="group" aria-label="Language">
