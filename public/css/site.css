@@ -168,7 +168,7 @@ a:hover {
   inset: 0;
   background:
     linear-gradient(180deg, rgba(16, 24, 32, 0.25) 0%, rgba(16, 24, 32, 0.55) 45%, rgba(16, 24, 32, 0.92) 100%),
-    url("/img/hero.svg") center / cover no-repeat,
+    url("../img/hero.svg") center / cover no-repeat,
     linear-gradient(135deg, #1a2a3a, #3d2a22);
   transform: scale(1.02);
   animation: heroIn 1.4s var(--ease) both;

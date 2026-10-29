@@ -1,10 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+(function () {
+  var path = location.pathname;
+  var base = "/";
+  if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
+  window.EP_BASE = base;
+  window.EP = window.EP || {};
+  window.EP.url = function (p) {
+    if (p == null || p === "") return p;
+    if (/^(?:[a-z]+:|\/\/|#|\?)/i.test(p)) return p;
+    var root = window.EP_BASE || "/";
+    if (p.charAt(0) === "/") return root.replace(/\/$/, "") + p;
+    return root + p;
+  };
+  document.write('<base href="' + base + '">');
+})();
+</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Games · EP Newsletter</title>
-  <link rel="stylesheet" href="/css/site.css">
+  <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
   <header class="site-header" id="site-header"></header>
@@ -15,27 +32,27 @@
     </div>
     <section class="section">
       <div class="games-grid" id="games-grid">
-        <a class="game-link" href="/games/sanctoral">
+        <a class="game-link" href="games/sanctoral.html">
           <h2>Sanctoral match</h2>
           <p data-game-desc="sanctoral">Match saints to their titles.</p>
         </a>
-        <a class="game-link" href="/games/ordo">
+        <a class="game-link" href="games/ordo.html">
           <h2>Ordo scramble</h2>
           <p data-game-desc="ordo">Put the Low Mass in order.</p>
         </a>
-        <a class="game-link" href="/games/campanile">
+        <a class="game-link" href="games/campanile.html">
           <h2>Campanile</h2>
           <p data-game-desc="campanile">Ring for feasts. Skip the ferias.</p>
         </a>
-        <a class="game-link" href="/games/vestment-run">
+        <a class="game-link" href="games/vestment-run.html">
           <h2>Vestment run</h2>
           <p data-game-desc="vestment">Catch the right liturgical color.</p>
         </a>
-        <a class="game-link" href="/games/latin-lightning">
+        <a class="game-link" href="games/latin-lightning.html">
           <h2>Latin lightning</h2>
           <p data-game-desc="latin">Flash rounds on Mass Latin.</p>
         </a>
-        <a class="game-link" href="/games/sacristy-sort">
+        <a class="game-link" href="games/sacristy-sort.html">
           <h2>Sacristy sort</h2>
           <p data-game-desc="sacristy">Set the altar and credence.</p>
         </a>
@@ -43,10 +60,10 @@
     </section>
   </main>
   <footer class="site-footer" id="site-footer"></footer>
-  <script src="/js/i18n.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/admin.js"></script>
-  <script src="/js/layout.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/layout.js"></script>
   <script>
     const DESCS = {
       en: {

@@ -28,15 +28,15 @@
     }
 
     if (cover) {
-      cover.href = "/issue?id=" + encodeURIComponent(latest.id);
+      cover.href = window.EP.url("/issue.html?id=" + encodeURIComponent(latest.id));
       cover.innerHTML = latest.cover
-        ? `<img src="/issues/${latest.cover}" alt="">`
+        ? `<img src="${window.EP.url("/issues/" + latest.cover)}" alt="">`
         : "";
     }
     if (meta) {
       meta.innerHTML = `<strong>${window.EP.i18n.pick(latest.title)}</strong><span>${formatDate(latest.date)}</span>`;
     }
-    if (cta) cta.href = "/issue?id=" + encodeURIComponent(latest.id);
+    if (cta) cta.href = window.EP.url("/issue.html?id=" + encodeURIComponent(latest.id));
 
     const blurb = window.EP.i18n.pick(homeData.fromIssue);
     const wrap = document.getElementById("from-issue-wrap");

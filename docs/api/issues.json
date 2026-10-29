@@ -1,0 +1,43 @@
+{
+  "issues": [
+    {
+      "id": "2026-09-28",
+      "date": "2026-09-28",
+      "title": {
+        "en": "St. Michael",
+        "es": "San Miguel"
+      },
+      "file": "2026-09-28.pdf",
+      "cover": "2026-09-28.svg",
+      "sample": true,
+      "pdfUrl": "https://erdtheturd.github.io/ygnewsletter/issues/2026-09-28.pdf",
+      "coverUrl": "https://erdtheturd.github.io/ygnewsletter/issues/2026-09-28.svg"
+    },
+    {
+      "id": "2026-09-14",
+      "date": "2026-09-14",
+      "title": {
+        "en": "Exaltation of the Cross",
+        "es": "Exaltación de la Santa Cruz"
+      },
+      "file": "2026-09-14.pdf",
+      "cover": "2026-09-14.svg",
+      "sample": true,
+      "pdfUrl": "https://erdtheturd.github.io/ygnewsletter/issues/2026-09-14.pdf",
+      "coverUrl": "https://erdtheturd.github.io/ygnewsletter/issues/2026-09-14.svg"
+    },
+    {
+      "id": "2026-09-07",
+      "date": "2026-09-07",
+      "title": {
+        "en": "Ordinary Time",
+        "es": "Tiempo Ordinario"
+      },
+      "file": "2026-09-07.pdf",
+      "cover": "2026-09-07.svg",
+      "sample": true,
+      "pdfUrl": "https://erdtheturd.github.io/ygnewsletter/issues/2026-09-07.pdf",
+      "coverUrl": "https://erdtheturd.github.io/ygnewsletter/issues/2026-09-07.svg"
+    }
+  ]
+}

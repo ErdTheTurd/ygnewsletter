@@ -11,6 +11,8 @@ npm start
 
 Open http://localhost:3000
 
+The public site is https://erdtheturd.github.io/ygnewsletter/ . `npm run pages` rebuilds the static copy in `docs/` that GitHub Pages publishes. Saves and uploads still need this Node server.
+
 Admin: type `helloworld` anywhere (not in a form field). Escape locks again. Override with `EDIT_PASSPHRASE`.
 
 ## Public API (FSSP iOS-ready)

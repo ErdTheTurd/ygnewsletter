@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function () {
+  var path = location.pathname;
+  var base = "/";
+  if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
+  window.EP_BASE = base;
+  window.EP = window.EP || {};
+  window.EP.url = function (p) {
+    if (p == null || p === "") return p;
+    if (/^(?:[a-z]+:|\/\/|#|\?)/i.test(p)) return p;
+    var root = window.EP_BASE || "/";
+    if (p.charAt(0) === "/") return root.replace(/\/$/, "") + p;
+    return root + p;
+  };
+  document.write('<base href="' + base + '">');
+})();
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EP Newsletter · El Paso</title>
+  <meta name="description" content="EP Newsletter. Immaculate Conception Church FSSP youth group, El Paso.">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip</a>
+  <header class="site-header" id="site-header"></header>
+  <main id="main">
+    <section class="hero">
+      <div class="hero__media" role="img" aria-label="El Paso dusk over the parish"></div>
+      <div class="hero__content">
+        <h1 class="hero__brand">E<em>P</em></h1>
+        <p class="hero__line" id="hero-tagline"></p>
+        <div class="btn-row">
+          <a class="btn" id="cta-current" href="archive.html" data-i18n="cta_current">Open current issue</a>
+          <a class="btn btn--ghost" href="archive.html" data-i18n="cta_archive">Archive</a>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <h2 class="section__title" data-i18n="latest_title">Current issue</h2>
+      <hr class="section__rule">
+      <div class="latest">
+        <a class="cover" id="latest-cover" href="archive.html"></a>
+        <div>
+          <div class="cover-tile__meta" id="latest-meta"></div>
+          <div id="from-issue-wrap" hidden style="margin-top:1.5rem">
+            <h3 style="font-family:var(--font-display);margin:0 0 0.5rem;color:var(--gold)" data-i18n="from_issue">From this issue</h3>
+            <p class="prose" id="from-issue"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" id="site-footer"></footer>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/pages/home.js"></script>
+</body>
+</html>

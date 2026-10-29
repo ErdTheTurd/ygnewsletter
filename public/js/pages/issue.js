@@ -16,11 +16,11 @@
     }
     if (title) title.textContent = window.EP.i18n.pick(issue.title);
     if (frame) {
-      frame.src = "/issues/" + issue.file;
+      frame.src = window.EP.url("/issues/" + issue.file);
       frame.hidden = false;
     }
     if (download) {
-      download.href = "/issues/" + issue.file;
+      download.href = window.EP.url("/issues/" + issue.file);
       download.download = issue.file;
     }
     window.addEventListener("ep:lang", () => {
