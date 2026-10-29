@@ -46,8 +46,8 @@
         "es": "Santa Teresa de Ávila"
       },
       "attr": {
-        "en": "Doctor of the Church, reformer of Carmel",
-        "es": "Doctora de la Iglesia, reformadora del Carmelo"
+        "en": "Carmelite virgin",
+        "es": "Virgen carmelita"
       }
     },
     {
@@ -234,15 +234,15 @@
     },
     {
       "cue": {
-        "en": "Assumption of Mary",
-        "es": "Asunción de María"
+        "en": "Assumption of the Blessed Virgin Mary",
+        "es": "Asunción de la Santísima Virgen"
       },
       "ring": true
     },
     {
       "cue": {
-        "en": "Ordinary weekday",
-        "es": "Día ordinario"
+        "en": "Feria after Pentecost",
+        "es": "Feria después de Pentecostés"
       },
       "ring": false
     },
@@ -269,6 +269,34 @@
     },
     {
       "cue": {
+        "en": "Immaculate Conception",
+        "es": "Inmaculada Concepción"
+      },
+      "ring": true
+    },
+    {
+      "cue": {
+        "en": "Nativity of St. John the Baptist",
+        "es": "Natividad de San Juan Bautista"
+      },
+      "ring": true
+    },
+    {
+      "cue": {
+        "en": "Ash Wednesday",
+        "es": "Miércoles de Ceniza"
+      },
+      "ring": false
+    },
+    {
+      "cue": {
+        "en": "Feria after Epiphany",
+        "es": "Feria después de Epifanía"
+      },
+      "ring": false
+    },
+    {
+      "cue": {
         "en": "Simple feria",
         "es": "Feria simple"
       },
@@ -292,8 +320,8 @@
     },
     {
       "feast": {
-        "en": "Ordinary Sunday",
-        "es": "Domingo ordinario"
+        "en": "Sunday after Pentecost",
+        "es": "Domingo después de Pentecostés"
       },
       "color": "green"
     },

@@ -669,7 +669,10 @@ a.cover:hover {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.9rem;
+  margin-bottom: 0.6rem;
 }
+
+.games-grid + .kicker { margin-top: 1.6rem; }
 
 .game-link {
   display: flex;
@@ -917,10 +920,115 @@ body.is-admin .admin-editable {
 }
 
 .ordo-list li {
-  padding: 0.7rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.45rem 0.45rem 0.85rem;
   border-radius: 12px;
   background: #fff6ee;
   cursor: grab;
+}
+
+.ordo-list li span { flex: 1; }
+
+.ordo-move {
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--gold);
+  color: var(--clay);
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.game-help { margin: 0 0 0.7rem; color: var(--muted); }
+
+.match-card.is-wrong { background: #f3a8bc; }
+
+.choice-row button.is-wrong { background: #f3a8bc; }
+
+.pass-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.2rem;
+  transform: translateX(-50%);
+  z-index: 90;
+  max-width: min(32rem, calc(100vw - 2rem));
+  background: var(--clay);
+  color: var(--cream);
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  text-align: center;
+}
+
+.sticker--lilac { background: #c9b4ee; transform: rotate(1.2deg); }
+.sticker--pink { background: #f3a8bc; transform: rotate(-1.3deg); }
+.sticker--apricot { background: #f7c59a; transform: rotate(0.8deg); }
+
+.ttt {
+  display: grid;
+  grid-template-columns: repeat(3, 92px);
+  gap: 0.45rem;
+  justify-content: center;
+}
+
+.ttt button {
+  height: 92px;
+  border: 0;
+  border-radius: 16px;
+  background: #fff6ee;
+  color: var(--clay);
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 680;
+  cursor: pointer;
+}
+
+.ttt button:disabled { cursor: default; }
+
+.letter-row, .guess-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-bottom: 0.8rem;
+}
+
+.letter-row button, .guess-row span {
+  min-width: 2.4rem;
+  height: 2.6rem;
+  padding: 0 0.4rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--gold);
+  color: var(--clay);
+  font-family: var(--font-body);
+  font-weight: 720;
+  font-size: 1.15rem;
+}
+
+.guess-row span { display: inline-grid; place-items: center; background: #fff6ee; }
+
+.mem-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.mem-card {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 14px;
+  background: var(--clay);
+  color: transparent;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  cursor: pointer;
+}
+
+.mem-card.is-up, .mem-card.is-matched {
+  background: #fff6ee;
+  color: inherit;
 }
 
 .ordo-list li.is-active { background: #ffd7bf; }

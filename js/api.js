@@ -43,12 +43,16 @@
   }
 
   async function checkAuth(passphrase) {
-    const res = await fetch(resolve("/api/auth/check"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ passphrase }),
-    });
-    return res.ok;
+    try {
+      const res = await fetch(resolve("/api/auth/check"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passphrase }),
+      });
+      return res.status;
+    } catch (err) {
+      return 0;
+    }
   }
 
   window.EP = window.EP || {};

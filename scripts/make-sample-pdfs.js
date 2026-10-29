@@ -57,33 +57,8 @@ function pdfFor(title, subtitle, filename) {
   fs.writeFileSync(path.join(OUT, filename), pdf);
 }
 
-pdfFor("EP Newsletter", "Sample Issue: Ordinary Time", "2026-09-07.pdf");
+pdfFor("EP Newsletter", "Sample Issue: Fifteenth Sunday after Pentecost", "2026-09-07.pdf");
 pdfFor("EP Newsletter", "Sample Issue: Exaltation of the Cross", "2026-09-14.pdf");
 pdfFor("EP Newsletter", "Sample Issue: St. Michael", "2026-09-28.pdf");
 
-// Simple SVG covers rendered as placeholder PNGs aren't trivial without deps;
-// write SVG covers the site can use.
-function svgCover(label, file) {
-  const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="640" viewBox="0 0 480 640">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#152238"/>
-      <stop offset="100%" stop-color="#3d2a22"/>
-    </linearGradient>
-  </defs>
-  <rect width="480" height="640" fill="url(#g)"/>
-  <rect x="28" y="28" width="424" height="584" fill="none" stroke="#b8973a" stroke-width="2"/>
-  <text x="240" y="220" text-anchor="middle" font-family="Georgia, serif" font-size="72" fill="#e8e0d4">EP</text>
-  <text x="240" y="280" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#b8973a">NEWSLETTER</text>
-  <text x="240" y="360" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#c9b8a8">${label}</text>
-  <text x="240" y="560" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#8a7a6a">Immaculate Conception · El Paso</text>
-</svg>`;
-  fs.writeFileSync(path.join(OUT, file), svg);
-}
-
-svgCover("7 September 2026", "2026-09-07.svg");
-svgCover("14 September 2026", "2026-09-14.svg");
-svgCover("28 September 2026", "2026-09-28.svg");
-
-console.log("Sample PDFs and covers written to issues/");
+console.log("Sample PDFs written to issues/");

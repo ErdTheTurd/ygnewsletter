@@ -13,7 +13,7 @@ Open http://localhost:3000
 
 The public site is https://erdtheturd.github.io/ygnewsletter/ . `npm run pages` refreshes the static files Pages serves from the repository root. Saves and uploads still need this Node server.
 
-Admin: type `helloworld` anywhere (not in a form field). Escape locks again. Override with `EDIT_PASSPHRASE`.
+Admin: click the page and type `hello world` (a space is fine; not inside a form field). Escape locks again. Override with `EDIT_PASSPHRASE`. Editing only answers on the Node server, not on GitHub Pages.
 
 ## Public API (FSSP iOS-ready)
 

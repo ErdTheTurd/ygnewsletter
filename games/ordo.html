@@ -4,6 +4,14 @@
 <script>
 (function () {
   var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
   var base = "/";
   if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
   window.EP_BASE = base;
@@ -47,39 +55,36 @@
 
     function render() {
       const board = document.getElementById("game-board");
-      board.innerHTML = '<ul class="ordo-list" id="ordo-list"></ul><p id="ordo-msg"></p>';
+      board.innerHTML = '<p class="game-help" id="ordo-help"></p><ul class="ordo-list" id="ordo-list"></ul><p id="ordo-msg"></p>';
+      document.getElementById("ordo-help").textContent = EP.i18n.t("ordo_help");
       const list = document.getElementById("ordo-list");
+      function move(from, to) {
+        if (from == null || to < 0 || to >= current.length || from === to) return;
+        const [moved] = current.splice(from, 1);
+        current.splice(to, 0, moved);
+        dragIndex = null;
+        render();
+      }
       current.forEach((item, idx) => {
         const li = document.createElement("li");
         li.draggable = true;
-        li.textContent = EP.i18n.pick(item);
-        li.dataset.idx = idx;
+        const label = document.createElement("span");
+        label.textContent = EP.i18n.pick(item);
+        const up = document.createElement("button");
+        up.type = "button";
+        up.className = "ordo-move";
+        up.textContent = "↑";
+        up.addEventListener("click", (e) => { e.stopPropagation(); move(idx, idx - 1); });
+        const down = document.createElement("button");
+        down.type = "button";
+        down.className = "ordo-move";
+        down.textContent = "↓";
+        down.addEventListener("click", (e) => { e.stopPropagation(); move(idx, idx + 1); });
+        li.append(label, up, down);
         li.addEventListener("dragstart", () => { dragIndex = idx; li.classList.add("is-active"); });
         li.addEventListener("dragend", () => li.classList.remove("is-active"));
         li.addEventListener("dragover", (e) => e.preventDefault());
-        li.addEventListener("drop", () => {
-          const to = idx;
-          if (dragIndex === null || dragIndex === to) return;
-          const [moved] = current.splice(dragIndex, 1);
-          current.splice(to, 0, moved);
-          dragIndex = null;
-          render();
-        });
-        // tap swap for mobile: select then tap target
-        li.addEventListener("click", () => {
-          if (dragIndex === null) {
-            dragIndex = idx;
-            li.classList.add("is-active");
-          } else {
-            const from = dragIndex;
-            dragIndex = null;
-            if (from !== idx) {
-              const [moved] = current.splice(from, 1);
-              current.splice(idx, 0, moved);
-            }
-            render();
-          }
-        });
+        li.addEventListener("drop", () => move(dragIndex, idx));
         list.appendChild(li);
       });
     }

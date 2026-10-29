@@ -61,12 +61,16 @@ function withIssueUrls(req, manifest) {
   return { ...manifest, issues };
 }
 
+function normPass(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z]/g, "");
+}
+
 function requirePassphrase(req, res, next) {
   const provided =
     req.get("x-edit-passphrase") ||
     (req.body && req.body.passphrase) ||
     req.query.passphrase;
-  if (provided !== EDIT_PASSPHRASE) {
+  if (normPass(provided) !== normPass(EDIT_PASSPHRASE)) {
     return res.status(401).json({ error: "Unauthorized" });
   }
   next();
@@ -169,8 +173,22 @@ app.post(
 );
 
 app.post("/api/auth/check", (req, res) => {
-  const ok = (req.body && req.body.passphrase) === EDIT_PASSPHRASE;
+  const ok = normPass(req.body && req.body.passphrase) === normPass(EDIT_PASSPHRASE);
   res.status(ok ? 200 : 401).json({ ok });
+});
+
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+  const pathOnly = req.path;
+  if (/\/404\.html$/.test(pathOnly)) return next();
+  let clean = null;
+  if (/\/index\.html$/.test(pathOnly)) clean = pathOnly.replace(/\/index\.html$/, "/") || "/";
+  else if (/\.html$/.test(pathOnly)) clean = pathOnly.replace(/\.html$/, "") || "/";
+  if (clean == null) return next();
+  const q = req.originalUrl.includes("?")
+    ? req.originalUrl.slice(req.originalUrl.indexOf("?"))
+    : "";
+  res.redirect(302, clean + q);
 });
 
 /* Clean routes before static so /games is not treated as a directory listing */
@@ -186,12 +204,12 @@ const pages = [
 ];
 
 for (const page of pages) {
-  app.get(`/${page}`, (_req, res) => {
+  app.get([`/${page}`, `/${page}/`], (_req, res) => {
     res.sendFile(path.join(PUBLIC, `${page}.html`));
   });
 }
 
-app.get("/games/:slug", (req, res) => {
+app.get(["/games/:slug", "/games/:slug/"], (req, res) => {
   const slug = String(req.params.slug || "").replace(/\.html$/, "");
   const file = path.join(PUBLIC, "games", `${slug}.html`);
   if (fs.existsSync(file)) return res.sendFile(file);

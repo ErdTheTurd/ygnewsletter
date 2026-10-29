@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function () {
+  var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
+  var base = "/";
+  if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
+  window.EP_BASE = base;
+  window.EP = window.EP || {};
+  window.EP.url = function (p) {
+    if (p == null || p === "") return p;
+    if (/^(?:[a-z]+:|\/\/|#|\?)/i.test(p)) return p;
+    var root = window.EP_BASE || "/";
+    if (p.charAt(0) === "/") return root.replace(/\/$/, "") + p;
+    return root + p;
+  };
+  document.write('<base href="' + base + '">');
+})();
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Memory · EP</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main id="game-root"></main>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/games/common.js"></script>
+  <script>
+    const FACES = ["🌵", "🎸", "⚽️", "🌮", "🌞", "🌉", "⚡️", "🦊"];
+    const root = document.getElementById("game-root");
+    root.innerHTML = EP.games.shell("Memory");
+    let open = [];
+    let lock = false;
+    let matched = 0;
+    let moves = 0;
+    let start = 0;
+
+    function meta() {
+      const best = EP.games.getBestTime("memory");
+      document.getElementById("game-meta").textContent =
+        "Moves: " + moves + " · " + EP.i18n.t("game_best") + ": " +
+        (best ? (best / 1000).toFixed(1) + "s" : "-");
+    }
+
+    function startGame() {
+      open = [];
+      lock = false;
+      matched = 0;
+      moves = 0;
+      start = Date.now();
+      const cards = EP.games.shuffle(FACES.flatMap((face, i) => [
+        { face, pair: i, id: i + "a" },
+        { face, pair: i, id: i + "b" }
+      ]));
+      const board = document.getElementById("game-board");
+      board.innerHTML = '<div class="mem-grid" id="mem"></div>';
+      const grid = document.getElementById("mem");
+      cards.forEach((card) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "mem-card";
+        btn.textContent = card.face;
+        btn.dataset.pair = card.pair;
+        btn.addEventListener("click", () => flip(btn));
+        grid.appendChild(btn);
+      });
+      meta();
+    }
+
+    function flip(btn) {
+      if (lock || btn.classList.contains("is-up") || btn.classList.contains("is-matched")) return;
+      btn.classList.add("is-up");
+      open.push(btn);
+      if (open.length < 2) return;
+      moves++;
+      meta();
+      const [a, b] = open;
+      open = [];
+      if (a.dataset.pair === b.dataset.pair) {
+        a.classList.add("is-matched");
+        b.classList.add("is-matched");
+        matched++;
+        if (matched === FACES.length) {
+          const ms = Date.now() - start;
+          EP.games.setBestTime("memory", ms);
+          meta();
+          document.getElementById("game-meta").textContent += " · " + (ms / 1000).toFixed(1) + "s";
+        }
+      } else {
+        lock = true;
+        setTimeout(() => {
+          a.classList.remove("is-up");
+          b.classList.remove("is-up");
+          lock = false;
+        }, 650);
+      }
+    }
+
+    document.getElementById("game-actions").innerHTML =
+      `<button class="btn" id="start-btn" data-i18n="game_again"></button>`;
+    EP.i18n.apply();
+    document.getElementById("start-btn").addEventListener("click", startGame);
+    startGame();
+  </script>
+</body>
+</html>

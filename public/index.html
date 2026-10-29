@@ -4,6 +4,14 @@
 <script>
 (function () {
   var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
   var base = "/";
   if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
   window.EP_BASE = base;
@@ -39,11 +47,11 @@
             <p class="prose" id="from-issue"></p>
           </div>
           <div class="btn-row">
-            <a class="btn" id="cta-current" href="archive.html" data-i18n="cta_current">Read this issue</a>
-            <a class="btn btn--gold" href="archive.html" data-i18n="cta_archive">All issues</a>
+            <a class="btn" id="cta-current" href="archive" data-i18n="cta_current">Read this issue</a>
+            <a class="btn btn--gold" href="archive" data-i18n="cta_archive">All issues</a>
           </div>
         </div>
-        <a class="cover splash__cover" id="latest-cover" href="archive.html"></a>
+        <a class="cover splash__cover" id="latest-cover" href="archive"></a>
       </div>
     </section>
     <section class="rack" id="rack" hidden>
@@ -56,12 +64,15 @@
       <div class="band__inner">
         <div class="play__head">
           <h2 data-i18n="play_title">Play a round</h2>
-          <a href="games.html" data-i18n="play_all">All games</a>
+          <a href="games" data-i18n="play_all">All games</a>
         </div>
         <div class="play__row">
-          <a class="sticker sticker--peach" href="games/sanctoral.html">Sanctoral match</a>
-          <a class="sticker sticker--gold" href="games/campanile.html">Campanile</a>
-          <a class="sticker sticker--teal" href="games/latin-lightning.html">Latin lightning</a>
+          <a class="sticker sticker--peach" href="games/tic-tac-toe">Tic-tac-toe</a>
+          <a class="sticker sticker--gold" href="games/scramble">Word scramble</a>
+          <a class="sticker sticker--teal" href="games/memory">Memory</a>
+          <a class="sticker sticker--lilac" href="games/sanctoral">Sanctoral match</a>
+          <a class="sticker sticker--pink" href="games/campanile">Campanile</a>
+          <a class="sticker sticker--apricot" href="games/latin-lightning">Latin lightning</a>
         </div>
       </div>
     </section>

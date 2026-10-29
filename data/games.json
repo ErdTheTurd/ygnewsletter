@@ -4,7 +4,7 @@
     { "name": { "en": "St. Peter", "es": "San Pedro" }, "attr": { "en": "Prince of the Apostles", "es": "Príncipe de los Apóstoles" } },
     { "name": { "en": "St. Paul", "es": "San Pablo" }, "attr": { "en": "Apostle to the Gentiles", "es": "Apóstol de los gentiles" } },
     { "name": { "en": "St. Michael", "es": "San Miguel" }, "attr": { "en": "Prince of the heavenly host", "es": "Príncipe de la milicia celestial" } },
-    { "name": { "en": "St. Teresa of Avila", "es": "Santa Teresa de Ávila" }, "attr": { "en": "Doctor of the Church, reformer of Carmel", "es": "Doctora de la Iglesia, reformadora del Carmelo" } },
+    { "name": { "en": "St. Teresa of Avila", "es": "Santa Teresa de Ávila" }, "attr": { "en": "Carmelite virgin", "es": "Virgen carmelita" } },
     { "name": { "en": "St. Thomas Aquinas", "es": "Santo Tomás de Aquino" }, "attr": { "en": "Angelic Doctor", "es": "Doctor Angélico" } },
     { "name": { "en": "St. Francis of Assisi", "es": "San Francisco de Asís" }, "attr": { "en": "Founder of the Friars Minor", "es": "Fundador de los frailes menores" } },
     { "name": { "en": "St. Clare", "es": "Santa Clara" }, "attr": { "en": "Foundress of the Poor Clares", "es": "Fundadora de las Clarisas" } }
@@ -46,17 +46,21 @@
   "campanile": [
     { "cue": { "en": "Feast of St. Joseph", "es": "Fiesta de San José" }, "ring": true },
     { "cue": { "en": "Feria", "es": "Feria" }, "ring": false },
-    { "cue": { "en": "Assumption of Mary", "es": "Asunción de María" }, "ring": true },
-    { "cue": { "en": "Ordinary weekday", "es": "Día ordinario" }, "ring": false },
+    { "cue": { "en": "Assumption of the Blessed Virgin Mary", "es": "Asunción de la Santísima Virgen" }, "ring": true },
+    { "cue": { "en": "Feria after Pentecost", "es": "Feria después de Pentecostés" }, "ring": false },
     { "cue": { "en": "Christ the King", "es": "Cristo Rey" }, "ring": true },
     { "cue": { "en": "Feria of Lent", "es": "Feria de Cuaresma" }, "ring": false },
     { "cue": { "en": "All Saints", "es": "Todos los Santos" }, "ring": true },
+    { "cue": { "en": "Immaculate Conception", "es": "Inmaculada Concepción" }, "ring": true },
+    { "cue": { "en": "Nativity of St. John the Baptist", "es": "Natividad de San Juan Bautista" }, "ring": true },
+    { "cue": { "en": "Ash Wednesday", "es": "Miércoles de Ceniza" }, "ring": false },
+    { "cue": { "en": "Feria after Epiphany", "es": "Feria después de Epifanía" }, "ring": false },
     { "cue": { "en": "Simple feria", "es": "Feria simple" }, "ring": false }
   ],
   "vestments": [
     { "feast": { "en": "Christmas", "es": "Navidad" }, "color": "white" },
     { "feast": { "en": "Pentecost", "es": "Pentecostés" }, "color": "red" },
-    { "feast": { "en": "Ordinary Sunday", "es": "Domingo ordinario" }, "color": "green" },
+    { "feast": { "en": "Sunday after Pentecost", "es": "Domingo después de Pentecostés" }, "color": "green" },
     { "feast": { "en": "Good Friday", "es": "Viernes Santo" }, "color": "black" },
     { "feast": { "en": "Advent Sunday", "es": "Domingo de Adviento" }, "color": "violet" },
     { "feast": { "en": "Martyr's feast", "es": "Fiesta de mártir" }, "color": "red" },

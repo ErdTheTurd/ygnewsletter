@@ -38,7 +38,7 @@
   function shell(title) {
     return `
       <div class="game-shell">
-        <p><a href="${window.EP.url("/games.html")}">← Games</a></p>
+        <p><a href="${window.EP.url("/games")}">← Games</a></p>
         <h1>${title}</h1>
         <div class="game-meta" id="game-meta"></div>
         <div class="game-board" id="game-board"></div>
