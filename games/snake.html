@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function () {
+  var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
+  var base = "/";
+  if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
+  window.EP_BASE = base;
+  window.EP = window.EP || {};
+  window.EP.url = function (p) {
+    if (p == null || p === "") return p;
+    if (/^(?:[a-z]+:|\/\/|#|\?)/i.test(p)) return p;
+    var root = window.EP_BASE || "/";
+    if (p.charAt(0) === "/") return root.replace(/\/$/, "") + p;
+    return root + p;
+  };
+  document.write('<base href="' + base + '">');
+})();
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Snake · EP</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main id="game-root"></main>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/games/common.js"></script>
+  <script>
+    const COLS = 18;
+    const root = document.getElementById("game-root");
+    root.innerHTML = EP.games.shell("Snake");
+    let snake = [];
+    let dir = { x: 1, y: 0 };
+    let queued = { x: 1, y: 0 };
+    let food = { x: 10, y: 8 };
+    let alive = false;
+    let waiting = true;
+    let acc = 0;
+    let last = 0;
+    let step = 150;
+    let frame = 0;
+    let canvas;
+    let ctx;
+
+    function score() { return Math.max(0, snake.length - 3); }
+
+    function meta(extra) {
+      document.getElementById("game-meta").textContent =
+        (extra ? extra + " · " : "") + "Length " + snake.length + " · Best " + EP.games.getBest("snake");
+    }
+
+    function occupy(x, y) {
+      return snake.some((part) => part.x === x && part.y === y);
+    }
+
+    function placeFood() {
+      const open = [];
+      for (let y = 0; y < COLS; y++) {
+        for (let x = 0; x < COLS; x++) if (!occupy(x, y)) open.push({ x, y });
+      }
+      food = open[Math.floor(Math.random() * open.length)] || food;
+    }
+
+    function turn(next) {
+      if (!alive && !waiting) return;
+      if (next.x === -dir.x && next.y === -dir.y) return;
+      queued = next;
+      if (waiting) {
+        waiting = false;
+        alive = true;
+        dir = queued;
+        last = 0;
+        acc = 0;
+        frame = requestAnimationFrame(loop);
+      }
+    }
+
+    function tick() {
+      dir = queued;
+      const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+      const eating = head.x === food.x && head.y === food.y;
+      const hitSelf = snake.some((part, i) => part.x === head.x && part.y === head.y && (eating || i !== snake.length - 1));
+      if (head.x < 0 || head.y < 0 || head.x >= COLS || head.y >= COLS || hitSelf) {
+        alive = false;
+        EP.games.setBest("snake", score());
+        meta("Crashed");
+        return;
+      }
+      snake.unshift(head);
+      if (head.x === food.x && head.y === food.y) {
+        placeFood();
+        step = Math.max(80, step - 4);
+        EP.games.setBest("snake", score());
+      } else {
+        snake.pop();
+      }
+      meta("");
+    }
+
+    function draw() {
+      const size = canvas.width / COLS;
+      ctx.fillStyle = "#241410";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#e85d2c";
+      ctx.fillRect(food.x * size + 2, food.y * size + 2, size - 4, size - 4);
+      snake.forEach((part, i) => {
+        ctx.fillStyle = i === 0 ? "#f0a202" : "#1f8a80";
+        ctx.fillRect(part.x * size + 1, part.y * size + 1, size - 2, size - 2);
+      });
+    }
+
+    function loop(t) {
+      if (!alive) { draw(); return; }
+      if (!last) last = t;
+      acc += t - last;
+      last = t;
+      while (acc >= step && alive) {
+        acc -= step;
+        tick();
+      }
+      draw();
+      if (alive) frame = requestAnimationFrame(loop);
+    }
+
+    function start() {
+      cancelAnimationFrame(frame);
+      snake = [{ x: 4, y: 9 }, { x: 3, y: 9 }, { x: 2, y: 9 }];
+      dir = { x: 1, y: 0 };
+      queued = { x: 1, y: 0 };
+      alive = false;
+      waiting = true;
+      step = 150;
+      acc = 0;
+      last = 0;
+      placeFood();
+      draw();
+      meta("Press an arrow");
+    }
+
+    document.getElementById("game-board").innerHTML = `
+      <div class="snake-wrap">
+        <canvas id="snake" width="432" height="432"></canvas>
+        <div class="pad">
+          <button class="pad-up" type="button" data-x="0" data-y="-1">↑</button>
+          <button class="pad-left" type="button" data-x="-1" data-y="0">←</button>
+          <button class="pad-down" type="button" data-x="0" data-y="1">↓</button>
+          <button class="pad-right" type="button" data-x="1" data-y="0">→</button>
+        </div>
+      </div>`;
+    canvas = document.getElementById("snake");
+    ctx = canvas.getContext("2d");
+    document.querySelectorAll(".pad button").forEach((btn) => {
+      btn.addEventListener("click", () => turn({ x: Number(btn.dataset.x), y: Number(btn.dataset.y) }));
+    });
+    const keys = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+    document.addEventListener("keydown", (e) => {
+      const next = keys[e.key];
+      if (!next) return;
+      e.preventDefault();
+      turn({ x: next[0], y: next[1] });
+    });
+    let touchX = 0;
+    let touchY = 0;
+    canvas.addEventListener("pointerdown", (e) => { touchX = e.clientX; touchY = e.clientY; });
+    canvas.addEventListener("pointerup", (e) => {
+      const dx = e.clientX - touchX;
+      const dy = e.clientY - touchY;
+      if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
+      if (Math.abs(dx) > Math.abs(dy)) turn({ x: dx > 0 ? 1 : -1, y: 0 });
+      else turn({ x: 0, y: dy > 0 ? 1 : -1 });
+    });
+    document.getElementById("game-actions").innerHTML =
+      `<button class="btn" id="again" type="button">New snake</button>`;
+    document.getElementById("again").addEventListener("click", start);
+    start();
+  </script>
+</body>
+</html>

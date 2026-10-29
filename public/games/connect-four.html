@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function () {
+  var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
+  var base = "/";
+  if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
+  window.EP_BASE = base;
+  window.EP = window.EP || {};
+  window.EP.url = function (p) {
+    if (p == null || p === "") return p;
+    if (/^(?:[a-z]+:|\/\/|#|\?)/i.test(p)) return p;
+    var root = window.EP_BASE || "/";
+    if (p.charAt(0) === "/") return root.replace(/\/$/, "") + p;
+    return root + p;
+  };
+  document.write('<base href="' + base + '">');
+})();
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect Four · EP</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main id="game-root"></main>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/games/common.js"></script>
+  <script>
+    const root = document.getElementById("game-root");
+    root.innerHTML = EP.games.shell("Connect Four");
+    const ORDER = [3, 2, 4, 1, 5, 0, 6];
+    let board = [];
+    let locked = false;
+    let status = "Your turn. Gold is you.";
+
+    function drop(cells, col, player) {
+      const next = cells.slice();
+      for (let r = 5; r >= 0; r--) {
+        const i = r * 7 + col;
+        if (!next[i]) {
+          next[i] = player;
+          return next;
+        }
+      }
+      return null;
+    }
+
+    function winner(cells) {
+      const dirs = [[1, 0], [0, 1], [1, 1], [1, -1]];
+      for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 7; c++) {
+          const player = cells[r * 7 + c];
+          if (!player) continue;
+          for (const [dr, dc] of dirs) {
+            let n = 1;
+            for (let k = 1; k < 4; k++) {
+              const rr = r + dr * k;
+              const cc = c + dc * k;
+              if (rr < 0 || rr > 5 || cc < 0 || cc > 6 || cells[rr * 7 + cc] !== player) break;
+              n++;
+            }
+            if (n === 4) return player;
+          }
+        }
+      }
+      return cells.every(Boolean) ? "draw" : 0;
+    }
+
+    function windows(cells) {
+      const found = [];
+      for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 7; c++) {
+          if (c <= 3) found.push([0, 1, 2, 3].map((k) => cells[r * 7 + c + k]));
+          if (r <= 2) found.push([0, 1, 2, 3].map((k) => cells[(r + k) * 7 + c]));
+          if (r <= 2 && c <= 3) found.push([0, 1, 2, 3].map((k) => cells[(r + k) * 7 + c + k]));
+          if (r <= 2 && c >= 3) found.push([0, 1, 2, 3].map((k) => cells[(r + k) * 7 + c - k]));
+        }
+      }
+      return found;
+    }
+
+    function evaluate(cells) {
+      let score = 0;
+      windows(cells).forEach((group) => {
+        const mine = group.filter((n) => n === 2).length;
+        const yours = group.filter((n) => n === 1).length;
+        if (mine && !yours) score += [0, 1, 6, 30, 100][mine];
+        if (yours && !mine) score -= [0, 1, 8, 40, 100][yours];
+      });
+      return score;
+    }
+
+    function search(cells, depth, alpha, beta, cpu) {
+      const done = winner(cells);
+      if (done === 2) return 1000 + depth;
+      if (done === 1) return -1000 - depth;
+      if (done === "draw" || depth === 0) return evaluate(cells);
+      let best = cpu ? -Infinity : Infinity;
+      for (const col of ORDER) {
+        const next = drop(cells, col, cpu ? 2 : 1);
+        if (!next) continue;
+        const score = search(next, depth - 1, alpha, beta, !cpu);
+        if (cpu) {
+          best = Math.max(best, score);
+          alpha = Math.max(alpha, score);
+        } else {
+          best = Math.min(best, score);
+          beta = Math.min(beta, score);
+        }
+        if (alpha >= beta) break;
+      }
+      return best;
+    }
+
+    function cpuMove(cells) {
+      let choice = ORDER.find((col) => drop(cells, col, 2));
+      let best = -Infinity;
+      ORDER.forEach((col) => {
+        const next = drop(cells, col, 2);
+        if (!next) return;
+        if (winner(next) === 2) { choice = col; best = Infinity; return; }
+        const score = search(next, 4, -Infinity, Infinity, false);
+        if (score > best) { best = score; choice = col; }
+      });
+      return choice;
+    }
+
+    function meta() {
+      document.getElementById("game-meta").textContent =
+        status + " · Wins " + EP.games.getBest("connect4");
+    }
+
+    function paint() {
+      const grid = document.getElementById("c4");
+      grid.querySelectorAll("button").forEach((btn, i) => {
+        btn.className = board[i] === 1 ? "is-you" : board[i] === 2 ? "is-cpu" : "";
+        btn.disabled = locked || !!board[i];
+      });
+      meta();
+    }
+
+    function finish(state) {
+      locked = true;
+      if (state === 1) {
+        EP.games.setBest("connect4", EP.games.getBest("connect4") + 1);
+        status = "Four in a row. You win.";
+      } else if (state === 2) {
+        status = "The computer got four.";
+      } else {
+        status = "The board is full.";
+      }
+      paint();
+    }
+
+    function play(col) {
+      if (locked) return;
+      const next = drop(board, col, 1);
+      if (!next) return;
+      board = next;
+      const state = winner(board);
+      if (state) return finish(state);
+      status = "Computer is thinking.";
+      locked = true;
+      paint();
+      setTimeout(() => {
+        board = drop(board, cpuMove(board), 2);
+        locked = false;
+        const after = winner(board);
+        if (after) return finish(after);
+        status = "Your turn.";
+        paint();
+      }, 180);
+    }
+
+    function start() {
+      board = Array(42).fill(0);
+      locked = false;
+      status = "Your turn. Gold is you.";
+      document.getElementById("game-board").innerHTML = '<div class="c4" id="c4"></div>';
+      const grid = document.getElementById("c4");
+      for (let i = 0; i < 42; i++) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.addEventListener("click", () => play(i % 7));
+        grid.appendChild(btn);
+      }
+      paint();
+    }
+
+    document.getElementById("game-actions").innerHTML =
+      `<button class="btn" id="again" type="button">New game</button>`;
+    document.getElementById("again").addEventListener("click", start);
+    start();
+  </script>
+</body>
+</html>

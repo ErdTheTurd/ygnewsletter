@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function () {
+  var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
+  var base = "/";
+  if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
+  window.EP_BASE = base;
+  window.EP = window.EP || {};
+  window.EP.url = function (p) {
+    if (p == null || p === "") return p;
+    if (/^(?:[a-z]+:|\/\/|#|\?)/i.test(p)) return p;
+    var root = window.EP_BASE || "/";
+    if (p.charAt(0) === "/") return root.replace(/\/$/, "") + p;
+    return root + p;
+  };
+  document.write('<base href="' + base + '">');
+})();
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Battleship · EP</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main id="game-root"></main>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/games/common.js"></script>
+  <script>
+    const FLEET = [
+      { id: "carrier", name: "Carrier", len: 5 },
+      { id: "battleship", name: "Battleship", len: 4 },
+      { id: "cruiser", name: "Cruiser", len: 3 },
+      { id: "sub", name: "Submarine", len: 3 },
+      { id: "destroyer", name: "Destroyer", len: 2 }
+    ];
+    const root = document.getElementById("game-root");
+    root.innerHTML = EP.games.shell("Battleship");
+    document.querySelector(".game-shell").classList.add("game-shell--wide");
+
+    let phase = "place";
+    let horizontal = true;
+    let selected = "carrier";
+    let player = {};
+    let enemy = {};
+    let playerShots = new Set();
+    let enemyShots = new Set();
+    let hunt = [];
+    let busy = false;
+    let logText = "Place your fleet, then open fire.";
+    let wins = EP.games.getBest("battleship");
+
+    function key(r, c) { return r + "," + c; }
+
+    function cellsFor(r, c, len, across) {
+      const cells = [];
+      for (let i = 0; i < len; i++) {
+        const rr = r + (across ? 0 : i);
+        const cc = c + (across ? i : 0);
+        if (rr > 9 || cc > 9 || rr < 0 || cc < 0) return null;
+        cells.push(key(rr, cc));
+      }
+      return cells;
+    }
+
+    function taken(fleet, ignore) {
+      const set = new Set();
+      Object.entries(fleet).forEach(([id, cells]) => {
+        if (id === ignore) return;
+        cells.forEach((cell) => set.add(cell));
+      });
+      return set;
+    }
+
+    function overlaps(cells, fleet, ignore) {
+      const set = taken(fleet, ignore);
+      return cells.some((cell) => set.has(cell));
+    }
+
+    function ownerOf(fleet, cell) {
+      return Object.keys(fleet).find((id) => fleet[id].includes(cell)) || null;
+    }
+
+    function sunk(fleet, id, shots) {
+      return fleet[id] && fleet[id].every((cell) => shots.has(cell));
+    }
+
+    function allSunk(fleet, shots) {
+      return FLEET.every((ship) => sunk(fleet, ship.id, shots));
+    }
+
+    function randomFleet() {
+      for (let attempt = 0; attempt < 40; attempt++) {
+        const placed = {};
+        let ok = true;
+        FLEET.forEach((ship) => {
+          let laid = false;
+          for (let guard = 0; guard < 200 && !laid; guard++) {
+            const across = Math.random() < 0.5;
+            const r = Math.floor(Math.random() * 10);
+            const c = Math.floor(Math.random() * 10);
+            const cells = cellsFor(r, c, ship.len, across);
+            if (!cells || overlaps(cells, placed)) continue;
+            placed[ship.id] = cells;
+            laid = true;
+          }
+          if (!laid) ok = false;
+        });
+        if (ok) return placed;
+      }
+      return randomFleet();
+    }
+
+    function meta() {
+      const yours = FLEET.filter((ship) => player[ship.id] && !sunk(player, ship.id, enemyShots)).length;
+      const theirs = phase === "place"
+        ? 5
+        : FLEET.filter((ship) => !sunk(enemy, ship.id, playerShots)).length;
+      document.getElementById("game-meta").textContent =
+        "Your ships " + yours + " · Their ships " + theirs + " · Wins " + wins;
+    }
+
+    function label(text) {
+      const el = document.createElement("i");
+      el.textContent = text;
+      return el;
+    }
+
+    function cellClass(kind, r, c) {
+      const cell = key(r, c);
+      if (kind === "yours") {
+        const id = ownerOf(player, cell);
+        const shot = enemyShots.has(cell);
+        if (id && shot && sunk(player, id, enemyShots)) return "is-sunk";
+        if (id && shot) return "is-hit";
+        if (shot) return "is-miss";
+        if (id) return "is-ship";
+        return "";
+      }
+      if (!playerShots.has(cell)) return "";
+      const id = ownerOf(enemy, cell);
+      if (id && sunk(enemy, id, playerShots)) return "is-sunk";
+      if (id) return "is-hit";
+      return "is-miss";
+    }
+
+    function previewCells(r, c) {
+      if (phase !== "place") return null;
+      const ship = FLEET.find((item) => item.id === selected);
+      if (!ship) return null;
+      return cellsFor(r, c, ship.len, horizontal);
+    }
+
+    function paintGrid(el, kind) {
+      el.innerHTML = "";
+      el.appendChild(label(""));
+      for (let c = 1; c <= 10; c++) el.appendChild(label(String(c)));
+      for (let r = 0; r < 10; r++) {
+        el.appendChild(label("ABCDEFGHIJ"[r]));
+        for (let c = 0; c < 10; c++) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          const cls = cellClass(kind, r, c);
+          btn.className = "cell " + cls;
+          if (cls === "is-miss") btn.textContent = "×";
+          if (cls === "is-hit" || cls === "is-sunk") btn.textContent = "●";
+          btn.disabled = kind === "theirs" ? phase !== "battle" || busy : phase !== "place";
+          if (kind === "yours" && phase === "place") {
+            btn.addEventListener("pointerenter", () => showPreview(r, c));
+            btn.addEventListener("click", () => placeSelected(r, c));
+          }
+          if (kind === "theirs" && phase === "battle") {
+            btn.addEventListener("click", () => fire(r, c));
+          }
+          el.appendChild(btn);
+        }
+      }
+    }
+
+    function showPreview(r, c) {
+      const cells = previewCells(r, c);
+      const bad = !cells || overlaps(cells, player, selected);
+      document.querySelectorAll("#yours .cell").forEach((btn, index) => {
+        const rr = Math.floor(index / 10);
+        const cc = index % 10;
+        btn.classList.remove("is-preview", "is-bad");
+        if (cells && cells.includes(key(rr, cc))) btn.classList.add(bad ? "is-bad" : "is-preview");
+      });
+    }
+
+    function render() {
+      const board = document.getElementById("game-board");
+      if (!board.querySelector("#yours")) {
+        board.innerHTML = `
+          <div class="fleet" id="fleet"></div>
+          <div class="sea-wrap">
+            <div><h3>Your fleet</h3><div class="sea" id="yours"></div></div>
+            <div><h3>Their fleet</h3><div class="sea" id="theirs"></div></div>
+          </div>
+          <p class="sea-log" id="sea-log"></p>`;
+      }
+      const fleet = document.getElementById("fleet");
+      fleet.innerHTML = "";
+      fleet.hidden = phase !== "place";
+      FLEET.forEach((ship) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "mini-btn" + (selected === ship.id ? " is-on" : "");
+        btn.textContent = ship.name + " (" + ship.len + ")" + (player[ship.id] ? " ✓" : "");
+        btn.addEventListener("click", () => { selected = ship.id; render(); });
+        fleet.appendChild(btn);
+      });
+      paintGrid(document.getElementById("yours"), "yours");
+      paintGrid(document.getElementById("theirs"), "theirs");
+      document.getElementById("sea-log").textContent = logText;
+      const placing = phase === "place";
+      const start = document.getElementById("start-battle");
+      if (start) start.disabled = !placing || FLEET.some((ship) => !player[ship.id]);
+      const randomBtn = document.getElementById("random-btn");
+      const rotateBtn = document.getElementById("rotate-btn");
+      if (randomBtn) randomBtn.disabled = !placing;
+      if (rotateBtn) rotateBtn.disabled = !placing;
+      meta();
+    }
+
+    function placeSelected(r, c) {
+      const ship = FLEET.find((item) => item.id === selected);
+      const cells = cellsFor(r, c, ship.len, horizontal);
+      if (!cells || overlaps(cells, player, ship.id)) return;
+      player[ship.id] = cells;
+      const next = FLEET.find((item) => !player[item.id]);
+      if (next) selected = next.id;
+      logText = next ? "Place the " + next.name.toLowerCase() + "." : "Fleet set. Open fire when you are ready.";
+      render();
+    }
+
+    function noteSink(fleet, id, who) {
+      if (id && sunk(fleet, id, who === "you" ? playerShots : enemyShots)) {
+        const ship = FLEET.find((item) => item.id === id);
+        return who === "you" ? "You sunk their " + ship.name.toLowerCase() + "." : "They sunk your " + ship.name.toLowerCase() + ".";
+      }
+      return null;
+    }
+
+    function fire(r, c) {
+      const cell = key(r, c);
+      if (playerShots.has(cell) || busy) return;
+      playerShots.add(cell);
+      const id = ownerOf(enemy, cell);
+      const sink = noteSink(enemy, id, "you");
+      logText = sink || (id ? "Hit." : "Miss.");
+      if (allSunk(enemy, playerShots)) {
+        phase = "over";
+        wins += 1;
+        EP.games.setBest("battleship", wins);
+        logText = "Their fleet is gone. You win.";
+        render();
+        return;
+      }
+      busy = true;
+      render();
+      setTimeout(() => {
+        computerFire();
+        busy = false;
+        render();
+      }, 420);
+    }
+
+    function computerFire() {
+      let cell = null;
+      while (hunt.length && !cell) {
+        const next = hunt.shift();
+        if (!enemyShots.has(next)) cell = next;
+      }
+      if (!cell) {
+        const open = [];
+        for (let r = 0; r < 10; r++) {
+          for (let c = 0; c < 10; c++) {
+            const candidate = key(r, c);
+            if (!enemyShots.has(candidate) && (r + c) % 2 === 0) open.push(candidate);
+          }
+        }
+        const pool = open.length ? open : [];
+        if (!pool.length) {
+          for (let r = 0; r < 10; r++) {
+            for (let c = 0; c < 10; c++) {
+              const candidate = key(r, c);
+              if (!enemyShots.has(candidate)) pool.push(candidate);
+            }
+          }
+        }
+        cell = pool[Math.floor(Math.random() * pool.length)];
+      }
+      enemyShots.add(cell);
+      const [r, c] = cell.split(",").map(Number);
+      const id = ownerOf(player, cell);
+      if (id) {
+        [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dr, dc]) => {
+          const rr = r + dr;
+          const cc = c + dc;
+          if (rr >= 0 && rr < 10 && cc >= 0 && cc < 10) hunt.push(key(rr, cc));
+        });
+      }
+      const sink = noteSink(player, id, "them");
+      logText = sink || (id ? "They hit." : "They missed.");
+      if (allSunk(player, enemyShots)) {
+        phase = "over";
+        logText = "Your fleet is gone.";
+      }
+    }
+
+    function reset(randomize) {
+      phase = "place";
+      player = randomize ? randomFleet() : {};
+      enemy = {};
+      playerShots = new Set();
+      enemyShots = new Set();
+      hunt = [];
+      busy = false;
+      selected = "carrier";
+      horizontal = true;
+      logText = randomize ? "Fleet laid out at random. Move a ship or open fire." : "Place your fleet, then open fire.";
+      wins = EP.games.getBest("battleship");
+      render();
+    }
+
+    document.getElementById("game-actions").innerHTML = `
+      <button class="btn btn--ghost" id="rotate-btn" type="button">Rotate</button>
+      <button class="btn btn--ghost" id="random-btn" type="button">Random fleet</button>
+      <button class="btn" id="start-battle" type="button">Open fire</button>
+      <button class="btn btn--ghost" id="again-btn" type="button">New game</button>`;
+    document.getElementById("rotate-btn").addEventListener("click", () => { horizontal = !horizontal; logText = horizontal ? "Ships run across." : "Ships run down."; render(); });
+    document.getElementById("random-btn").addEventListener("click", () => { if (phase === "place") reset(true); });
+    document.getElementById("start-battle").addEventListener("click", () => {
+      if (FLEET.some((ship) => !player[ship.id])) return;
+      enemy = randomFleet();
+      phase = "battle";
+      logText = "Fire on their fleet.";
+      render();
+    });
+    document.getElementById("again-btn").addEventListener("click", () => reset(false));
+    reset(false);
+  </script>
+</body>
+</html>

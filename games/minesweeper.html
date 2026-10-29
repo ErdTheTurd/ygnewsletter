@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function () {
+  var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
+  var base = "/";
+  if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
+  window.EP_BASE = base;
+  window.EP = window.EP || {};
+  window.EP.url = function (p) {
+    if (p == null || p === "") return p;
+    if (/^(?:[a-z]+:|\/\/|#|\?)/i.test(p)) return p;
+    var root = window.EP_BASE || "/";
+    if (p.charAt(0) === "/") return root.replace(/\/$/, "") + p;
+    return root + p;
+  };
+  document.write('<base href="' + base + '">');
+})();
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minesweeper · EP</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main id="game-root"></main>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/games/common.js"></script>
+  <script>
+    const SIZE = 9;
+    const MINES = 10;
+    const root = document.getElementById("game-root");
+    root.innerHTML = EP.games.shell("Minesweeper");
+    let mines = [];
+    let open = [];
+    let flags = [];
+    let flagMode = false;
+    let alive = true;
+    let started = 0;
+    let laid = false;
+
+    function idx(r, c) { return r * SIZE + c; }
+
+    function neighbors(i) {
+      const r = Math.floor(i / SIZE);
+      const c = i % SIZE;
+      const list = [];
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          if (!dr && !dc) continue;
+          const rr = r + dr;
+          const cc = c + dc;
+          if (rr >= 0 && rr < SIZE && cc >= 0 && cc < SIZE) list.push(idx(rr, cc));
+        }
+      }
+      return list;
+    }
+
+    function lay(safe) {
+      const banned = new Set([safe, ...neighbors(safe)]);
+      const spots = [];
+      for (let i = 0; i < SIZE * SIZE; i++) if (!banned.has(i)) spots.push(i);
+      mines = EP.games.shuffle(spots).slice(0, MINES);
+      laid = true;
+      started = Date.now();
+    }
+
+    function count(i) {
+      return neighbors(i).filter((n) => mines.includes(n)).length;
+    }
+
+    function meta(extra) {
+      const left = MINES - flags.filter(Boolean).length;
+      const best = EP.games.getBestTime("mines");
+      document.getElementById("game-meta").textContent =
+        (extra ? extra + " · " : "") +
+        "Mines " + left + " · Best " + (best ? (best / 1000).toFixed(1) + "s" : "-");
+    }
+
+    function won() {
+      return open.filter(Boolean).length === SIZE * SIZE - MINES;
+    }
+
+    function paint() {
+      const grid = document.getElementById("mines");
+      grid.querySelectorAll("button").forEach((btn, i) => {
+        btn.className = "";
+        btn.textContent = "";
+        if (flags[i] && !open[i]) {
+          btn.classList.add("is-flag");
+          btn.textContent = "⚑";
+        } else if (open[i]) {
+          btn.classList.add("is-open");
+          if (mines.includes(i)) {
+            btn.classList.add("is-mine");
+            btn.textContent = "•";
+          } else {
+            const n = count(i);
+            btn.textContent = n ? String(n) : "";
+          }
+        } else if (!alive && mines.includes(i)) {
+          btn.classList.add("is-mine");
+          btn.textContent = "•";
+        }
+      });
+    }
+
+    function reveal(i) {
+      if (!alive || open[i] || flags[i]) return;
+      if (!laid) lay(i);
+      if (mines.includes(i)) {
+        alive = false;
+        open[i] = true;
+        paint();
+        meta("Boom");
+        return;
+      }
+      const stack = [i];
+      while (stack.length) {
+        const cur = stack.pop();
+        if (open[cur] || flags[cur]) continue;
+        open[cur] = true;
+        if (count(cur) === 0) neighbors(cur).forEach((n) => { if (!open[n]) stack.push(n); });
+      }
+      paint();
+      if (won()) {
+        alive = false;
+        const ms = Date.now() - started;
+        EP.games.setBestTime("mines", ms);
+        meta("Clear in " + (ms / 1000).toFixed(1) + "s");
+      } else {
+        meta("");
+      }
+    }
+
+    function toggleFlag(i) {
+      if (!alive || open[i]) return;
+      flags[i] = !flags[i];
+      paint();
+      meta(flagMode ? "Flag mode" : "");
+    }
+
+    function start() {
+      mines = [];
+      open = Array(SIZE * SIZE).fill(false);
+      flags = Array(SIZE * SIZE).fill(false);
+      flagMode = false;
+      alive = true;
+      laid = false;
+      document.getElementById("flag-btn").classList.remove("is-on");
+      document.getElementById("game-board").innerHTML = '<div class="mines" id="mines"></div>';
+      const grid = document.getElementById("mines");
+      for (let i = 0; i < SIZE * SIZE; i++) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.addEventListener("click", () => (flagMode ? toggleFlag(i) : reveal(i)));
+        btn.addEventListener("contextmenu", (e) => { e.preventDefault(); toggleFlag(i); });
+        grid.appendChild(btn);
+      }
+      paint();
+      meta("Right-click or Flag marks a mine");
+    }
+
+    document.getElementById("game-actions").innerHTML = `
+      <button class="btn btn--ghost" id="flag-btn" type="button">Flag</button>
+      <button class="btn" id="again" type="button">New field</button>`;
+    document.getElementById("flag-btn").addEventListener("click", () => {
+      flagMode = !flagMode;
+      document.getElementById("flag-btn").classList.toggle("is-on", flagMode);
+      meta(flagMode ? "Flag mode" : "");
+    });
+    document.getElementById("again").addEventListener("click", start);
+    start();
+  </script>
+</body>
+</html>

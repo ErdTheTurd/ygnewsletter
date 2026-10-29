@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function () {
+  var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
+  var base = "/";
+  if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
+  window.EP_BASE = base;
+  window.EP = window.EP || {};
+  window.EP.url = function (p) {
+    if (p == null || p === "") return p;
+    if (/^(?:[a-z]+:|\/\/|#|\?)/i.test(p)) return p;
+    var root = window.EP_BASE || "/";
+    if (p.charAt(0) === "/") return root.replace(/\/$/, "") + p;
+    return root + p;
+  };
+  document.write('<base href="' + base + '">');
+})();
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mastermind · EP</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main id="game-root"></main>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/games/common.js"></script>
+  <script>
+    const COLORS = [
+      { id: "adobe", hex: "#e85d2c" },
+      { id: "gold", hex: "#f0a202" },
+      { id: "teal", hex: "#1f8a80" },
+      { id: "clay", hex: "#241410" },
+      { id: "pink", hex: "#e56a8a" },
+      { id: "lilac", hex: "#8d6cc2" }
+    ];
+    const ROWS = 10;
+    const root = document.getElementById("game-root");
+    root.innerHTML = EP.games.shell("Mastermind");
+    let secret = [];
+    let rows = [];
+    let guess = [];
+    let done = false;
+
+    function scoreGuess(attempt) {
+      let exact = 0;
+      const spareGuess = {};
+      const spareSecret = {};
+      for (let i = 0; i < 4; i++) {
+        if (attempt[i] === secret[i]) exact++;
+        else {
+          spareGuess[attempt[i]] = (spareGuess[attempt[i]] || 0) + 1;
+          spareSecret[secret[i]] = (spareSecret[secret[i]] || 0) + 1;
+        }
+      }
+      let color = 0;
+      Object.keys(spareGuess).forEach((id) => {
+        color += Math.min(spareGuess[id], spareSecret[id] || 0);
+      });
+      return { exact, color };
+    }
+
+    function hex(id) {
+      const found = COLORS.find((color) => color.id === id);
+      return found ? found.hex : "#fff6ee";
+    }
+
+    function meta(extra) {
+      document.getElementById("game-meta").textContent =
+        (extra ? extra + " · " : "Dark peg: right color and place. White peg: right color. · ") +
+        "Solved " + EP.games.getBest("mastermind");
+    }
+
+    function render() {
+      const board = document.getElementById("game-board");
+      board.innerHTML = '<div class="mm-board" id="mm"></div><div class="tool-row" id="palette"></div>';
+      const list = document.getElementById("mm");
+      rows.forEach((row) => {
+        const line = document.createElement("div");
+        line.className = "mm-row";
+        row.guess.forEach((id) => {
+          const peg = document.createElement("span");
+          peg.className = "peg";
+          peg.style.background = hex(id);
+          line.appendChild(peg);
+        });
+        const marks = document.createElement("div");
+        marks.className = "mm-pegs";
+        for (let i = 0; i < 4; i++) {
+          const mark = document.createElement("i");
+          if (i < row.exact) mark.className = "is-exact";
+          else if (i < row.exact + row.color) mark.className = "is-color";
+          marks.appendChild(mark);
+        }
+        line.appendChild(marks);
+        list.appendChild(line);
+      });
+      if (!done) {
+        const current = document.createElement("div");
+        current.className = "mm-row";
+        for (let i = 0; i < 4; i++) {
+          const peg = document.createElement("button");
+          peg.type = "button";
+          peg.className = "peg";
+          peg.style.background = guess[i] ? hex(guess[i]) : "#fff6ee";
+          peg.addEventListener("click", () => { guess.splice(i, 1); render(); });
+          current.appendChild(peg);
+        }
+        list.appendChild(current);
+      } else {
+        const reveal = document.createElement("div");
+        reveal.className = "mm-row";
+        secret.forEach((id) => {
+          const peg = document.createElement("span");
+          peg.className = "peg";
+          peg.style.background = hex(id);
+          reveal.appendChild(peg);
+        });
+        list.appendChild(reveal);
+      }
+      const palette = document.getElementById("palette");
+      COLORS.forEach((color) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "peg";
+        btn.style.background = color.hex;
+        btn.disabled = done;
+        btn.addEventListener("click", () => {
+          if (guess.length >= 4 || done) return;
+          guess.push(color.id);
+          render();
+        });
+        palette.appendChild(btn);
+      });
+      document.getElementById("submit-guess").disabled = done || guess.length !== 4;
+    }
+
+    function submit() {
+      if (guess.length !== 4 || done) return;
+      const result = scoreGuess(guess);
+      rows.push({ guess: guess.slice(), exact: result.exact, color: result.color });
+      guess = [];
+      if (result.exact === 4) {
+        done = true;
+        EP.games.setBest("mastermind", EP.games.getBest("mastermind") + 1);
+        meta("Code cracked in " + rows.length);
+      } else if (rows.length >= ROWS) {
+        done = true;
+        meta("Out of guesses. The code is below.");
+      } else {
+        meta(ROWS - rows.length + " guesses left");
+      }
+      render();
+    }
+
+    function start() {
+      secret = Array.from({ length: 4 }, () => COLORS[Math.floor(Math.random() * COLORS.length)].id);
+      rows = [];
+      guess = [];
+      done = false;
+      meta("Ten guesses. Repeats are allowed.");
+      render();
+    }
+
+    document.getElementById("game-actions").innerHTML = `
+      <button class="btn" id="submit-guess" type="button">Guess</button>
+      <button class="btn btn--ghost" id="again" type="button">New code</button>`;
+    document.getElementById("submit-guess").addEventListener("click", submit);
+    document.getElementById("again").addEventListener("click", start);
+    start();
+  </script>
+</body>
+</html>
