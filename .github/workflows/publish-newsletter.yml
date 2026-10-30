@@ -18,8 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        if: github.event.issue.user.login == 'ErdTheTurd' && github.event.issue.author_association == 'OWNER'
       - name: Apply the edit
         id: apply
+        if: github.event.issue.user.login == 'ErdTheTurd' && github.event.issue.author_association == 'OWNER'
         run: node scripts/apply-newsletter-edit.js
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
