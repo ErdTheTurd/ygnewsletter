@@ -794,8 +794,8 @@ a.cover:hover {
   right: 1rem;
   bottom: 1rem;
   z-index: 80;
-  width: min(420px, calc(100vw - 2rem));
-  max-height: min(70vh, 560px);
+  width: min(480px, calc(100vw - 2rem));
+  max-height: min(78vh, 680px);
   overflow: auto;
   background: var(--clay);
   color: var(--cream);
@@ -844,6 +844,63 @@ a.cover:hover {
 }
 
 .admin-bar textarea { min-height: 90px; resize: vertical; }
+
+.admin-bar textarea.edit-short { min-height: 64px; }
+
+.admin-bar select option { background: #3a221c; color: #fff6ee; }
+
+.edit-card {
+  margin-top: 0.85rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(255, 214, 190, 0.22);
+}
+
+.edit-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.edit-card__head strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.edit-grid label { margin-top: 0.45rem; }
+
+.admin-bar .edit-remove,
+.admin-bar .edit-add {
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.admin-bar .edit-remove {
+  background: transparent;
+  color: #ffb4b0;
+  padding: 0.2rem 0.15rem;
+}
+
+.admin-bar .edit-add {
+  margin-top: 0.9rem;
+  background: var(--gold);
+  color: var(--clay);
+  padding: 0.5rem 0.9rem;
+}
+
+.edit-empty {
+  margin: 0.3rem 0 0;
+  color: #f0cbb8;
+}
 
 .admin-bar__actions {
   display: flex;
