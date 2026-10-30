@@ -13,7 +13,7 @@ Open http://localhost:3000
 
 The public site is https://erdtheturd.github.io/ygnewsletter/ . `npm run pages` refreshes the static files Pages serves from the repository root. Saves and uploads still need this Node server.
 
-Admin: click the page and type `hello world` (a space is fine; not inside a form field). Escape locks again. Override with `EDIT_PASSPHRASE`. On GitHub Pages the editor still opens and keeps text changes in that browser. Publishing those changes for every visitor needs this Node server.
+Admin: click the page and type `hello world` (a space is fine; not inside a form field). Escape locks again. Override with `EDIT_PASSPHRASE`. On GitHub Pages, Save opens a GitHub issue. Submitting that issue publishes the change for every visitor. `npm start` still saves straight to the JSON files on this machine.
 
 ## Public API (FSSP iOS-ready)
 

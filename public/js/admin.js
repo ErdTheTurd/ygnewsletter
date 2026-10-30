@@ -73,20 +73,40 @@
     bar.querySelector("#admin-lock").addEventListener("click", lock);
     bar.querySelector("#admin-save").addEventListener("click", () => {
       if (typeof window.EP.saveAdmin === "function") {
+        const popup = window.EP.api.staticHost ? window.open("", "_blank") : null;
+        window.EP.api.publishUrls = [];
         window.EP.saveAdmin(passphrase).then((msg) => {
-          const extra = window.EP.api.savedLocally ? " " + window.EP.i18n.t("admin_local") : "";
-          setStatusOk((msg || "Saved.") + extra);
-        }).catch(setStatusErr);
+          const urls = window.EP.api.publishUrls || [];
+          if (urls[0] && popup) popup.location.href = urls[0];
+          if (urls.length) setStatusOk(window.EP.i18n.t("admin_publish"), urls);
+          else {
+            if (popup) popup.close();
+            setStatusOk(msg || "Saved.");
+          }
+        }).catch((err) => {
+          if (popup) popup.close();
+          setStatusErr(err);
+        });
       }
     });
     window.EP.i18n.apply();
   }
 
-  function setStatusOk(msg) {
+  function setStatusOk(msg, hrefs) {
     const el = document.getElementById("admin-status");
     if (!el) return;
     el.textContent = msg || "Saved.";
     el.className = "admin-bar__status is-ok";
+    const list = Array.isArray(hrefs) ? hrefs : hrefs ? [hrefs] : [];
+    list.forEach((href) => {
+      el.appendChild(document.createTextNode(" "));
+      const link = document.createElement("a");
+      link.href = href;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = window.EP.i18n.t("admin_publish_link");
+      el.appendChild(link);
+    });
   }
 
   function setStatusErr(err) {
