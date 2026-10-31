@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function () {
+  var path = location.pathname;
+  if (!/\/404\.html$/.test(path) && /\/index\.html$/.test(path)) {
+    location.replace(path.replace(/\/index\.html$/, "/") + location.search + location.hash);
+    return;
+  }
+  if (!/\/404\.html$/.test(path) && /\.html$/.test(path)) {
+    location.replace(path.replace(/\.html$/, "") + location.search + location.hash);
+    return;
+  }
+  var base = "/";
+  if (path === "/ygnewsletter" || path.indexOf("/ygnewsletter/") === 0) base = "/ygnewsletter/";
+  window.EP_BASE = base;
+  window.EP = window.EP || {};
+  window.EP.url = function (p) {
+    if (p == null || p === "") return p;
+    if (/^(?:[a-z]+:|\/\/|#|\?)/i.test(p)) return p;
+    var root = window.EP_BASE || "/";
+    if (p.charAt(0) === "/") return root.replace(/\/$/, "") + p;
+    return root + p;
+  };
+  document.write('<base href="' + base + '">');
+})();
+</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chess · EP</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+  <main id="game-root"></main>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/games/common.js"></script>
+  <script src="js/games/chess.js"></script>
+  <script>
+    const COPY = {
+      en: {
+        title: "Chess",
+        back: "← Games",
+        cpuMode: "Vs computer",
+        twoMode: "Two players",
+        your: "Your turn",
+        cpu: "Computer's turn",
+        white: "White to move",
+        black: "Black to move",
+        check: "Check",
+        youWin: "Checkmate. You win",
+        cpuWin: "Checkmate. Computer wins",
+        whiteWin: "Checkmate. White wins",
+        blackWin: "Checkmate. Black wins",
+        stale: "Stalemate",
+        promo: "Promote to",
+        q: "Queen",
+        r: "Rook",
+        b: "Bishop",
+        n: "Knight",
+        piece: { k: "King", q: "Queen", r: "Rook", b: "Bishop", n: "Knight", p: "Pawn" }
+      },
+      es: {
+        title: "Ajedrez",
+        back: "← Juegos",
+        cpuMode: "Contra la computadora",
+        twoMode: "Dos jugadores",
+        your: "Tu turno",
+        cpu: "Turno de la computadora",
+        white: "Juegan las blancas",
+        black: "Juegan las negras",
+        check: "Jaque",
+        youWin: "Jaque mate. Ganaste",
+        cpuWin: "Jaque mate. Gana la computadora",
+        whiteWin: "Jaque mate. Ganan las blancas",
+        blackWin: "Jaque mate. Ganan las negras",
+        stale: "Ahogado",
+        promo: "Coronar a",
+        q: "Dama",
+        r: "Torre",
+        b: "Alfil",
+        n: "Caballo",
+        piece: { k: "Rey", q: "Dama", r: "Torre", b: "Alfil", n: "Caballo", p: "Peón" }
+      }
+    };
+
+    const root = document.getElementById("game-root");
+    root.innerHTML = EP.games.shell("Chess");
+    let state = EPChess.start();
+    let mode = "cpu";
+    let selected = -1;
+    let locked = false;
+    let pending = [];
+    let timer = 0;
+    let view = EPChess.inspect(state);
+
+    function words() {
+      return COPY[EP.i18n.getLang()] || COPY.en;
+    }
+
+    function nameOf(index) {
+      return "abcdefgh"[index % 8] + (8 - Math.floor(index / 8));
+    }
+
+    function phase() {
+      const W = words();
+      if (view.status === "mate") {
+        const winner = state.turn === "w" ? "b" : "w";
+        if (mode === "cpu") return winner === "w" ? W.youWin : W.cpuWin;
+        return winner === "w" ? W.whiteWin : W.blackWin;
+      }
+      if (view.status === "stalemate") return W.stale;
+      let line = mode === "cpu" ? (state.turn === "w" ? W.your : W.cpu) : (state.turn === "w" ? W.white : W.black);
+      if (view.status === "check") line += " · " + W.check;
+      return line;
+    }
+
+    function paintChrome() {
+      const W = words();
+      const title = document.querySelector(".game-shell h1");
+      const back = document.querySelector(".game-shell > p a");
+      if (title) title.textContent = W.title;
+      if (back) back.textContent = W.back;
+      document.getElementById("mode-cpu").textContent = W.cpuMode;
+      document.getElementById("mode-two").textContent = W.twoMode;
+      document.getElementById("mode-cpu").classList.toggle("is-on", mode === "cpu");
+      document.getElementById("mode-two").classList.toggle("is-on", mode === "two");
+      document.getElementById("game-meta").textContent = phase();
+      document.title = W.title + " · EP";
+    }
+
+    function paintBoard() {
+      const W = words();
+      const targets = {};
+      if (!locked && selected >= 0) {
+        view.moves.forEach(function (move) {
+          if (move.from === selected) targets[move.to] = true;
+        });
+      }
+      const king = view.status === "check" || view.status === "mate"
+        ? state.board.indexOf(state.turn + "k")
+        : -1;
+      document.querySelectorAll("#chess-board .sq").forEach(function (btn, index) {
+        const piece = state.board[index];
+        btn.className = "sq " + ((Math.floor(index / 8) + index) % 2 === 0 ? "lt" : "dk");
+        if (state.last && (index === state.last.from || index === state.last.to)) btn.classList.add("is-last");
+        if (index === selected) btn.classList.add("is-sel");
+        btn.style.background = "";
+        if (index === king) {
+          btn.classList.add("is-check");
+          btn.style.background = "#e85d2c";
+        }
+        if (targets[index]) btn.classList.add(piece || index === state.ep ? "is-capture" : "is-move");
+        btn.innerHTML = (piece ? EPChess.pieceSvg(piece) : "") + (targets[index] ? '<i class="dot"></i>' : "");
+        if (piece) btn.classList.add(piece[0] === "w" ? "is-w" : "is-b");
+        const label = nameOf(index) + (piece ? " " + W.piece[piece[1]] : "");
+        btn.setAttribute("aria-label", label);
+        btn.disabled = locked;
+      });
+    }
+
+    function paintPromo() {
+      const box = document.getElementById("promo");
+      if (!pending.length) {
+        box.hidden = true;
+        box.innerHTML = "";
+        return;
+      }
+      const W = words();
+      const color = state.turn;
+      box.hidden = false;
+      box.innerHTML = '<p>' + W.promo + '</p><div class="promo-row"></div>';
+      const row = box.querySelector(".promo-row");
+      ["q", "r", "b", "n"].forEach(function (kind) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = color === "w" ? "is-w" : "is-b";
+        btn.setAttribute("aria-label", W[kind]);
+        btn.innerHTML = EPChess.pieceSvg(color + kind);
+        btn.addEventListener("click", function () {
+          const move = pending.find(function (item) { return item.promo === kind; });
+          pending = [];
+          commit(move);
+        });
+        row.appendChild(btn);
+      });
+    }
+
+    function paint() {
+      view = EPChess.inspect(state);
+      paintChrome();
+      paintBoard();
+      paintPromo();
+    }
+
+    function finishTurn() {
+      selected = -1;
+      pending = [];
+      view = EPChess.inspect(state);
+      const done = view.status === "mate" || view.status === "stalemate";
+      if (!done && mode === "cpu" && state.turn === "b") {
+        locked = true;
+        paint();
+        timer = setTimeout(function () {
+          const move = EPChess.choose(state);
+          if (move) state = EPChess.apply(state, move);
+          locked = false;
+          paint();
+        }, 160);
+        return;
+      }
+      locked = false;
+      paint();
+    }
+
+    function commit(move) {
+      state = EPChess.apply(state, move);
+      finishTurn();
+    }
+
+    function tap(index) {
+      if (locked || pending.length) return;
+      if (view.status === "mate" || view.status === "stalemate") return;
+      const piece = state.board[index];
+      if (selected >= 0) {
+        const choices = view.moves.filter(function (move) {
+          return move.from === selected && move.to === index;
+        });
+        if (choices.length > 1) {
+          pending = choices;
+          paintPromo();
+          return;
+        }
+        if (choices.length === 1) {
+          commit(choices[0]);
+          return;
+        }
+      }
+      if (piece && piece[0] === state.turn) {
+        selected = index;
+        paintBoard();
+        paintChrome();
+        return;
+      }
+      selected = -1;
+      paintBoard();
+    }
+
+    function fresh(nextMode) {
+      clearTimeout(timer);
+      mode = nextMode;
+      state = EPChess.start();
+      selected = -1;
+      locked = false;
+      pending = [];
+      paint();
+    }
+
+    function build() {
+      const frame = document.createElement("div");
+      frame.className = "chess-frame";
+      const grid = document.createElement("div");
+      grid.className = "chess-grid";
+      const ranks = document.createElement("div");
+      ranks.className = "chess-ranks";
+      for (let rank = 8; rank >= 1; rank--) {
+        const span = document.createElement("span");
+        span.textContent = String(rank);
+        ranks.appendChild(span);
+      }
+      const board = document.createElement("div");
+      board.id = "chess-board";
+      board.className = "chess-board";
+      for (let i = 0; i < 64; i++) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "sq";
+        btn.addEventListener("click", function () { tap(i); });
+        board.appendChild(btn);
+      }
+      const files = document.createElement("div");
+      files.className = "chess-files";
+      "abcdefgh".split("").forEach(function (file) {
+        const span = document.createElement("span");
+        span.textContent = file;
+        files.appendChild(span);
+      });
+      grid.appendChild(ranks);
+      grid.appendChild(board);
+      grid.appendChild(files);
+      frame.appendChild(grid);
+      const promo = document.createElement("div");
+      promo.id = "promo";
+      promo.className = "promo";
+      promo.hidden = true;
+      const mount = document.getElementById("game-board");
+      mount.innerHTML = "";
+      mount.appendChild(promo);
+      mount.appendChild(frame);
+      document.getElementById("game-actions").innerHTML =
+        '<button type="button" class="mini-btn is-on" id="mode-cpu"></button>' +
+        '<button type="button" class="mini-btn" id="mode-two"></button>' +
+        '<button type="button" class="btn" id="start-btn" data-i18n="game_again"></button>';
+      document.getElementById("mode-cpu").addEventListener("click", function () { fresh("cpu"); });
+      document.getElementById("mode-two").addEventListener("click", function () { fresh("two"); });
+      document.getElementById("start-btn").addEventListener("click", function () { fresh(mode); });
+    }
+
+    build();
+    EP.i18n.apply();
+    window.addEventListener("ep:lang", paint);
+    paint();
+  </script>
+</body>
+</html>
